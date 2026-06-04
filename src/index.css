@@ -1,0 +1,291 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #06A3DA;
+  --color-brand-h: #058bbd;
+  --color-brand-glow: rgba(6, 163, 218, 0.18);
+  --color-brand-light: rgba(6, 163, 218, 0.08);
+  --color-ink: #0b0b0f;
+  --color-ink-2: #2e2e38;
+  --color-ink-3: #72727a;
+  --color-paper: #fafaf8;
+  --color-paper-2: #f3f2ee;
+  --color-paper-3: #e6e4de;
+
+  --font-serif: "DM Serif Display", serif;
+  --font-sans: "DM Sans", sans-serif;
+  
+  --ease-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@layer base {
+  html {
+    font-size: 16px;
+    overflow-x: hidden;
+  }
+  /* Global Responsive Scaling */
+  @media (max-width: 1024px) {
+    html {
+      font-size: 15px;
+    }
+  }
+  @media (max-width: 768px) {
+    html {
+      font-size: 14.5px;
+    }
+  }
+  @media (max-width: 480px) {
+    html {
+      font-size: 13.5px;
+    }
+  }
+
+  body {
+    background-color: #fafaf8; /* --paper */
+    color: #0b0b0f; /* --ink */
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background-color: #06A3DA; /* --brand */
+    color: #fff;
+  }
+}
+
+/* Custom Keyframes */
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: ripple 2s ease infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes smoothScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes smoothSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth scroll animation utilities */
+html.smooth-scroll {
+  scroll-behavior: auto;
+}
+
+/* Smooth scrolling optimizations */
+body, html {
+  scroll-behavior: auto;
+}
+
+/* GPU acceleration for smooth animations */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimize for animations */
+button, a, [role="button"] {
+  will-change: transform, opacity, box-shadow;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Navbar animations */
+nav {
+  animation: slideDown 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: background-color, backdrop-filter;
+}
+
+/* Smooth transitions for all interactive elements */
+input, textarea, select {
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+input:focus, textarea:focus, select:focus {
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Floating WhatsApp Button */
+.whatsapp-float {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #25D366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+  z-index: 400;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+.whatsapp-float:hover {
+  transform: scale(1.12);
+  box-shadow: 0 12px 36px rgba(37, 211, 102, 0.45);
+}
+
+/* Form input focus ring override */
+input:focus, textarea:focus {
+  outline: none;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e6e4de;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #06A3DA;
+}
+
+@keyframes scrollDrop {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+    opacity: 1;
+  }
+  50% {
+    transform: scaleY(1);
+    transform-origin: top;
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+    opacity: 0;
+  }
+}
+
+.animate-scroll-drop {
+  animation: scrollDrop 1.8s ease-in-out infinite;
+}
+
+/* 3D Floating Cards Layout */
+.cards-3d {
+  position: relative;
+  height: 420px;
+  width: 420px;
+  max-width: 100%;
+  transform-style: preserve-3d;
+}
+
+.card-3d {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px; /* --r-lg */
+  padding: 1.8rem;
+  backdrop-filter: blur(6px);
+  transition: transform 0.1s linear;
+}
+
+.card-3d:nth-child(1) {
+  width: 78%;
+  bottom: 0;
+  left: 0;
+  transform: rotate(-2deg) translateZ(-30px);
+}
+
+.card-3d:nth-child(2) {
+  width: 88%;
+  top: 0;
+  right: 0;
+  transform: rotate(1.5deg) translateZ(-15px);
+}
+
+.card-3d:nth-child(3) {
+  width: 82%;
+  top: 50%;
+  left: 5%;
+  transform: translateY(-50%) rotate(0.5deg) translateZ(0);
+}
+
+.card-3d-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 0.8rem;
+}
+
+.card-3d-body {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.45;
+  font-style: italic;
+}
+
+.card-3d-bar {
+  height: 3px;
+  width: 32px;
+  background: #06A3DA; /* --brand */
+  border-radius: 2px;
+  margin-top: 1.2rem;
+  opacity: 0.7;
+}
+
+@media (max-width: 1100px) {
+  .cards-3d {
+    display: none;
+  }
+}

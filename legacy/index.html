@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptware Infotech — Digital Experiences That Perform</title>
+    <meta name="description"
+        content="We build premium, conversion-focused web applications and digital products that elevate your brand.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <!-- CURSOR -->
+    <div class="cursor" id="cursor">
+        <div class="cursor-dot" id="cursorDot"></div>
+        <div class="cursor-ring" id="cursorRing"></div>
+    </div>
+
+    <!-- MOBILE OVERLAY & DRAWER -->
+    <div class="mobile-overlay" id="overlay"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <a href="#home">Home</a>
+        <a href="#services">Services</a>
+        <a href="#why">Why Cryptware</a>
+        <a href="#about">About Us</a>
+        <a href="#tech">Tech Stack</a>
+        <a href="#contact" style="color:var(--brand);font-weight:500">Let's Talk →</a>
+    </div>
+
+    <!-- NAV -->
+    <nav id="navbar">
+        <div class="nav-inner">
+            <a href="#" class="nav-logo">
+                <div class="logo-mark">
+                    <svg fill="none" viewBox="0 0 24 24">
+                        <path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                Cryptware
+            </a>
+            <div class="nav-links">
+                <a href="#services">Services</a>
+                <a href="#why">About</a>
+                <a href="#tech">Tech</a>
+                <a href="#contact" class="nav-cta">
+                    Let's Talk
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <canvas class="hero-canvas" id="heroCanvas"></canvas>
+        <div class="hero-gradient"></div>
+        <div class="hero-grid-lines"></div>
+        <div class="hero-inner">
+            <div class="hero-eyebrow" id="heroEyebrow">
+                <div class="hero-pulse"></div>
+                Available for new projects
+            </div>
+            <h1 class="hero-title" id="heroTitle">
+                Shaping the future<br>of <span class="hero-title-accent">digital</span><br>experiences.
+            </h1>
+            <div class="hero-subtitle-wrap">
+                <p class="hero-subtitle" id="heroSub">We build premium, conversion-focused web &amp; mobile applications
+                    that elevate your brand and drive measurable growth — with precision and craft.</p>
+            </div>
+            <div class="hero-actions" id="heroActions">
+                <a href="#services" class="btn-primary">
+                    <span>Explore our work</span>
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </a>
+                <a href="#contact" class="btn-ghost">
+                    Start a conversation
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </div>
+            <!-- <div class="hero-stats" id="heroStats">
+                <div class="hero-stat">
+                    <div class="hero-stat-n">10+</div>
+                    <div class="hero-stat-l">Apps on stores</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-n">50+</div>
+                    <div class="hero-stat-l">Global clients</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-n">99%</div>
+                    <div class="hero-stat-l">Upwork score</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-n">7+</div>
+                    <div class="hero-stat-l">Years building</div>
+                </div>
+            </div> -->
+        </div>
+        <div class="hero-scroll-hint" id="heroScroll">
+            <div class="scroll-line"></div>
+            Scroll
+        </div>
+        <div class="hero-bottom-curve"></div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee-wrap" aria-hidden="true">
+        <div class="marquee-inner">
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                </svg>Web Development</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path
+                        d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3" />
+                </svg>Mobile Apps</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path
+                        d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+                </svg>UI/UX Design</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>React &amp; Angular</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path
+                        d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />
+                </svg>Flutter &amp; Kotlin</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path
+                        d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
+                </svg>AWS &amp; Azure</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path
+                        d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+                </svg>Agile &amp; Scrum</div>
+            <!-- duplicate -->
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                </svg>Web Development</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path
+                        d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3" />
+                </svg>Mobile Apps</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path
+                        d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+                </svg>UI/UX Design</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>React &amp; Angular</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path
+                        d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />
+                </svg>Flutter &amp; Kotlin</div>
+            <div class="marquee-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path
+                        d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
+                </svg>AWS &amp; Azure</div>
+        </div>
+    </div>
+
+    <!-- SERVICES -->
+    <section id="services">
+        <div class="section-wrap">
+            <div class="services-head">
+                <div>
+                    <span class="eyebrow" data-gsap="fadeUp">What we do</span>
+                    <h2 class="section-title" data-gsap="fadeUp" data-delay="0.1">Custom IT solutions for<br><em>your
+                            successful business</em></h2>
+                </div>
+                <a href="#contact" class="view-all" data-gsap="fadeUp" data-delay="0.2">
+                    Start a project
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </div>
+            <div class="services-grid">
+                <div class="service-card" data-gsap="fadeUp" data-delay="0.05">
+                    <div class="svc-num">01</div>
+                    <div class="svc-icon">
+                        <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25z" />
+                        </svg>
+                    </div>
+                    <h3>Web Development</h3>
+                    <p>End-to-end custom web applications, scalable architectures, and seamless e-commerce solutions
+                        built for real-world performance.</p>
+                    <div class="svc-arrow"><svg fill="none" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg></div>
+                </div>
+                <div class="service-card" data-gsap="fadeUp" data-delay="0.15">
+                    <div class="svc-num">02</div>
+                    <div class="svc-icon">
+                        <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                        </svg>
+                    </div>
+                    <h3>Mobile Apps</h3>
+                    <p>High-end native and cross-platform apps for iOS and Android — crafted to engage users and drive
+                        meaningful, measurable conversions.</p>
+                    <div class="svc-arrow"><svg fill="none" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg></div>
+                </div>
+                <div class="service-card" data-gsap="fadeUp" data-delay="0.25">
+                    <div class="svc-num">03</div>
+                    <div class="svc-icon">
+                        <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+                        </svg>
+                    </div>
+                    <h3>UI / UX Design</h3>
+                    <p>User-centric interfaces using Figma and Adobe XD — beautiful aesthetics meeting intuitive
+                        navigation for maximum conversion.</p>
+                    <div class="svc-arrow"><svg fill="none" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PARALLAX / WHY SECTION -->
+    <section class="parallax-section" id="why">
+        <div class="parallax-bg-dots" id="parallaxDots"></div>
+        <div class="parallax-glow" id="parallaxGlow"></div>
+        <div class="parallax-inner">
+            <div class="parallax-grid">
+                <div class="parallax-content">
+                    <span class="eyebrow" data-gsap="fadeUp">Why choose Cryptware</span>
+                    <h2 class="section-title" data-gsap="fadeUp" data-delay="0.1">Thinkers, makers<br><em>and
+                            partners</em></h2>
+                    <p data-gsap="fadeUp" data-delay="0.18">We closely work with your team to build an MVP that solves
+                        primary problems. Leveraging rich Scrum &amp; Lean experience, we follow Agile to deliver with
+                        the highest performance.</p>
+                    <p data-gsap="fadeUp" data-delay="0.24">We don't believe in selling services that don't serve your
+                        needs. We listen closely, research deeply, and build transparently.</p>
+                    <ul class="check-list">
+                        <li data-gsap="fadeUp" data-delay="0.30"><span class="check-ico"><svg fill="none"
+                                    stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path d="M4.5 12.75l6 6 9-13.5" />
+                                </svg></span>Develop MVP &amp; release versions frequently</li>
+                        <li data-gsap="fadeUp" data-delay="0.36"><span class="check-ico"><svg fill="none"
+                                    stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path d="M4.5 12.75l6 6 9-13.5" />
+                                </svg></span>160 man-hours guaranteed per month</li>
+                        <li data-gsap="fadeUp" data-delay="0.42"><span class="check-ico"><svg fill="none"
+                                    stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path d="M4.5 12.75l6 6 9-13.5" />
+                                </svg></span>Daily reporting &amp; weekly code delivery</li>
+                        <li data-gsap="fadeUp" data-delay="0.48"><span class="check-ico"><svg fill="none"
+                                    stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path d="M4.5 12.75l6 6 9-13.5" />
+                                </svg></span>Direct developer access — Skype, calls, chat</li>
+                        <li data-gsap="fadeUp" data-delay="0.54"><span class="check-ico"><svg fill="none"
+                                    stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path d="M4.5 12.75l6 6 9-13.5" />
+                                </svg></span>Flexible timezone — monthly or yearly hiring</li>
+                    </ul>
+                </div>
+                <div class="cards-3d" id="cards3d" data-gsap="fadeRight">
+                    <div class="card-3d">
+                        <div class="card-3d-label">Our approach</div>
+                        <div class="card-3d-body">"Think like a product, not as tasks or features."</div>
+                        <div class="card-3d-bar"></div>
+                    </div>
+                    <div class="card-3d">
+                        <div class="card-3d-label">Our commitment</div>
+                        <div class="card-3d-body">"Reasonable promises. Extraordinary delivery. Always."</div>
+                        <div class="card-3d-bar"></div>
+                    </div>
+                    <div class="card-3d">
+                        <div class="card-3d-label">Our culture</div>
+                        <div class="card-3d-body">"We invest 20% of profit training and developing our people."</div>
+                        <div class="card-3d-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BELIEFS -->
+    <section id="beliefs">
+        <div class="section-wrap">
+            <span class="eyebrow" data-gsap="fadeUp">What we believe</span>
+            <h2 class="section-title" data-gsap="fadeUp" data-delay="0.1">Principles that <em>guide every decision</em>
+            </h2>
+            <div class="beliefs-grid">
+                <div class="belief-card" data-gsap="fadeUp" data-delay="0.05">
+                    <div class="belief-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75s.168-.75.375-.75S9.75 9.336 9.75 9.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
+                        </svg></div>
+                    <h3>Customer Satisfaction</h3>
+                    <p>Our highest priority is to satisfy customers through early and continuous delivery of valuable,
+                        working software.</p>
+                </div>
+                <div class="belief-card" data-gsap="fadeUp" data-delay="0.12">
+                    <div class="belief-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                        </svg></div>
+                    <h3>No False Promises</h3>
+                    <p>Reasonable commitments, extraordinary delivery. We promise what we can do — then exceed it every
+                        time.</p>
+                </div>
+                <div class="belief-card" data-gsap="fadeUp" data-delay="0.19">
+                    <div class="belief-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V20.25a.75.75 0 001.28.53l3.58-3.58A48.458 48.458 0 0011.25 17c.406 0 .81-.012 1.21-.036" />
+                        </svg></div>
+                    <h3>Open Communication</h3>
+                    <p>Honest communication is the foundation of genuine engagement — boosting productivity, innovation,
+                        and satisfaction.</p>
+                </div>
+                <div class="belief-card" data-gsap="fadeUp" data-delay="0.26">
+                    <div class="belief-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg></div>
+                    <h3>Transparency &amp; Honesty</h3>
+                    <p>100% transparent — in process, in pricing, in progress. These principles motivate us to deliver
+                        incredible results.</p>
+                </div>
+                <div class="belief-card" data-gsap="fadeUp" data-delay="0.33">
+                    <div class="belief-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                        </svg></div>
+                    <h3>Continuous Delivery</h3>
+                    <p>DevOps processes for efficiency and velocity. Productive, happy teams ship better software —
+                        consistently.</p>
+                </div>
+                <div class="belief-card" data-gsap="fadeUp" data-delay="0.40">
+                    <div class="belief-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+                        </svg></div>
+                    <h3>Invest in People</h3>
+                    <p>Hiring from top universities and reinvesting 20% of profit in training — because our team's
+                        growth is your product's quality.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section class="tech-section" id="tech">
+        <div class="section-wrap">
+            <span class="eyebrow" data-gsap="fadeUp">Our tech stack</span>
+            <h2 class="section-title" data-gsap="fadeUp" data-delay="0.1">Built with the best <em>tools available</em>
+            </h2>
+            <div class="tech-grid">
+                <div class="tech-cell" data-gsap="fadeUp" data-delay="0.08">
+                    <div class="tech-cell-label"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                        </svg>Front-End</div>
+                    <div class="tech-pills">
+                        <span class="pill">HTML5</span><span class="pill">CSS3</span><span
+                            class="pill">JavaScript</span><span class="pill">React</span><span
+                            class="pill">Angular</span>
+                    </div>
+                </div>
+                <div class="tech-cell" data-gsap="fadeUp" data-delay="0.18">
+                    <div class="tech-cell-label"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" />
+                        </svg>Back-End</div>
+                    <div class="tech-pills">
+                        <span class="pill">.NET Core</span><span class="pill">Node.js</span><span
+                            class="pill">PHP</span><span class="pill">AWS</span><span class="pill">Azure</span>
+                    </div>
+                </div>
+                <div class="tech-cell" data-gsap="fadeUp" data-delay="0.28">
+                    <div class="tech-cell-label"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                        </svg>Mobile</div>
+                    <div class="tech-pills">
+                        <span class="pill">Flutter</span><span class="pill">Kotlin</span><span class="pill">React
+                            Native</span><span class="pill">iOS</span><span class="pill">Android</span>
+                    </div>
+                </div>
+                <div class="tech-cell" data-gsap="fadeUp" data-delay="0.38">
+                    <div class="tech-cell-label"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+                        </svg>Design &amp; Data</div>
+                    <div class="tech-pills">
+                        <span class="pill">Figma</span><span class="pill">Adobe XD</span><span
+                            class="pill">InVision</span><span class="pill">MongoDB</span><span class="pill">SQL</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHAT WE PROVIDE -->
+    <section class="provide-section">
+        <div class="section-wrap">
+            <span class="eyebrow" data-gsap="fadeUp">What we provide</span>
+            <h2 class="section-title" data-gsap="fadeUp" data-delay="0.1">Benefits of <em>hiring Cryptware</em></h2>
+            <div class="provide-grid">
+                <div class="provide-item" data-gsap="fadeUp" data-delay="0.05">
+                    <div class="provide-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                        </svg></div>
+                    <h3>Daily Reporting via Email</h3>
+                    <p>Full transparency with daily work-progress reports and a dedicated project manager for every
+                        project size.</p>
+                </div>
+                <div class="provide-item" data-gsap="fadeUp" data-delay="0.12">
+                    <div class="provide-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg></div>
+                    <h3>160 Man-Hours Guaranteed</h3>
+                    <p>Monthly rolling contracts with 160 hours of dedicated work exclusively on your project — on time,
+                        every time.</p>
+                </div>
+                <div class="provide-item" data-gsap="fadeUp" data-delay="0.19">
+                    <div class="provide-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                        </svg></div>
+                    <h3>Monthly / Yearly Hiring</h3>
+                    <p>Choose what works for your project — flexible engagement models tailored to your needs and
+                        timelines.</p>
+                </div>
+                <div class="provide-item" data-gsap="fadeUp" data-delay="0.26">
+                    <div class="provide-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg></div>
+                    <h3>Direct Resource Access</h3>
+                    <p>Connect directly with experienced developers on Skype, email, calls, and chat for complete,
+                        real-time transparency.</p>
+                </div>
+                <div class="provide-item" data-gsap="fadeUp" data-delay="0.33">
+                    <div class="provide-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                        </svg></div>
+                    <h3>Daily / Weekly Code Delivery</h3>
+                    <p>See the product in working mode — not just reports. Guaranteed code delivery daily and weekly,
+                        always on schedule.</p>
+                </div>
+                <div class="provide-item" data-gsap="fadeUp" data-delay="0.40">
+                    <div class="provide-ico"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path
+                                d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253M3.284 14.253A8.959 8.959 0 013 12c0-1.016.132-2 .38-2.934" />
+                        </svg></div>
+                    <h3>Flexible Timezone</h3>
+                    <p>We work across time zones. Our team adapts to your schedule so collaboration always feels
+                        effortless and responsive.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" style="background:var(--paper-2)">
+        <div class="section-wrap">
+            <div class="about-grid">
+                <div class="about-content">
+                    <span class="eyebrow" data-gsap="fadeUp">Who we are</span>
+                    <h2 class="section-title" data-gsap="fadeUp" data-delay="0.1">We care about<br><em>your success</em>
+                    </h2>
+                    <p data-gsap="fadeUp" data-delay="0.18">We are a team of extremely talented web and mobile app
+                        developers who love what they do and truly believe in creating long-term partnerships with our
+                        clients.</p>
+                    <p data-gsap="fadeUp" data-delay="0.25">Our team works hand-in-hand with clients to ensure the
+                        product not only succeeds but leaves a lasting impression — easy to use, thoughtfully designed,
+                        built around real users.</p>
+                    <p data-gsap="fadeUp" data-delay="0.32">We care about your success because it's directly tied to
+                        ours. We'd be honoured to be part of your journey.</p>
+                    <div class="metrics-grid">
+                        <div class="metric-box" data-gsap="fadeUp" data-delay="0.38">
+                            <div class="metric-n">10+</div>
+                            <div class="metric-l">Apps live on stores</div>
+                        </div>
+                        <div class="metric-box" data-gsap="fadeUp" data-delay="0.44">
+                            <div class="metric-n">50+</div>
+                            <div class="metric-l">Worldwide clients</div>
+                        </div>
+                        <div class="metric-box" data-gsap="fadeUp" data-delay="0.50">
+                            <div class="metric-n">99%</div>
+                            <div class="metric-l">Upwork success score</div>
+                        </div>
+                        <div class="metric-box" data-gsap="fadeUp" data-delay="0.56">
+                            <div class="metric-n">10/5</div>
+                            <div class="metric-l">Support availability</div>
+                        </div>
+                    </div>
+                    <a href="tel:+917490971996" class="contact-pill" data-gsap="fadeUp" data-delay="0.62">
+                        <div class="contact-pill-icon">
+                            <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path
+                                    d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 6.75z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p>Call to ask any question</p>
+                            <strong>+91 7490971996</strong>
+                        </div>
+                    </a>
+                </div>
+                <div class="about-visual" data-gsap="fadeRight">
+                    <div class="about-badge">
+                        <strong>7+</strong>
+                        Years of craft
+                    </div>
+                    <div class="about-frame">
+                        <div class="about-frame-inner">
+                            <svg fill="none" stroke-width="0.8" viewBox="0 0 24 24">
+                                <path
+                                    d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                            </svg>
+                            <p>Add your team or office image here (aboutUs1.jpg)</p>
+                        </div>
+                    </div>
+                    <div class="about-float">
+                        <div class="about-float-label">Headquarters</div>
+                        <strong>Ahmedabad, Gujarat</strong>
+                        <span>B-610, Titanium City Centre, Satellite — 380015</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIAL -->
+    <section class="testi-section">
+        <div class="section-wrap">
+            <div class="testi-container">
+                <span class="eyebrow" data-gsap="fadeUp">What clients say</span>
+                <div class="testi-marks">
+                    <div class="testi-mark active"></div>
+                    <div class="testi-mark"></div>
+                    <div class="testi-mark"></div>
+                </div>
+                <div data-gsap="fadeUp" data-delay="0.1">
+                    <div class="testi-star-row">
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                    </div>
+                    <p class="testi-quote">"Cryptware delivered beyond our expectations. Their attention to detail,
+                        premium design approach, and robust technical execution completely transformed our digital
+                        presence."</p>
+                    <div class="testi-author">
+                        <strong>Sarah Jenkins</strong>
+                        <span>CTO, FutureTech Inc.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section" id="contact">
+        <div class="cta-grid-lines"></div>
+        <div class="cta-glow"></div>
+        <div class="section-wrap">
+            <div class="cta-inner">
+                <h2 class="cta-title" data-gsap="fadeUp">Ready to build something extraordinary?</h2>
+                <p class="cta-sub" data-gsap="fadeUp" data-delay="0.12">Let's collaborate to bring your vision to life
+                    with precision and elegance. We're just one conversation away.</p>
+                <div class="cta-actions" data-gsap="fadeUp" data-delay="0.22">
+                    <a href="mailto:info@cryptwareinfotech.com" class="btn-cta">
+                        <span>Start a conversation</span>
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                    <a href="tel:+917490971996" class="btn-cta-outline">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 6.75z" />
+                        </svg>
+                        +91 7490971996
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="section-wrap">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-brand-name">
+                        <div class="logo-mark">
+                            <svg fill="none" viewBox="0 0 24 24">
+                                <path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" stroke="#fff" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        Cryptware Infotech
+                    </div>
+                    <p>India's trusted web, enterprise software &amp; mobile app development company. Innovation in our
+                        veins, passion in our hearts.</p>
+                    <div class="footer-social">
+                        <a href="https://wa.me/+917490971996" aria-label="WhatsApp">
+                            <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.953 9.953 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" />
+                            </svg>
+                        </a>
+                        <a href="https://www.linkedin.com/company/cryptware-infotech/" aria-label="LinkedIn">
+                            <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path
+                                    d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
+                                <circle cx="4" cy="4" r="2" />
+                            </svg>
+                        </a>
+                        <a href="#" aria-label="Instagram">
+                            <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                                <rect x="2" y="2" width="20" height="20" rx="5" />
+                                <circle cx="12" cy="12" r="5" />
+                                <circle cx="17.5" cy="6.5" r="1" fill="rgba(255,255,255,0.4)" stroke="none" />
+                            </svg>
+                        </a>
+                        <a href="#" aria-label="Facebook">
+                            <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <a href="#about">About Us</a>
+                    <a href="#services">Services</a>
+                    <a href="#beliefs">Our Values</a>
+                    <a href="#tech">Tech Stack</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Services</h4>
+                    <a href="#services">Web Development</a>
+                    <a href="#services">Mobile Apps</a>
+                    <a href="#services">UI/UX Design</a>
+                    <a href="#why">Hire Developers</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <p>+91 7490971996</p>
+                    <p>info@cryptwareinfotech.com</p>
+                    <p style="margin-top:0.8rem;font-size:0.8rem;line-height:1.65">B-610, Titanium City Centre,<br>100ft
+                        Anandnagar Rd, Satellite,<br>Ahmedabad — 380015</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Cryptware Infotech. All rights reserved.</p>
+                <div style="display:flex;gap:1.6rem">
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- ext js -->
+    <script src="./js/script.js"></script>
+</body>
+
+</html>
