@@ -217,7 +217,7 @@ export default function WhyChooseUs() {
           </div>
 
           {/* 3D CARDS VISUAL PANEL */}
-          <div className="hidden lg:flex justify-center select-none w-full">
+          <div className="flex justify-center select-none w-full">
             <div
               ref={cardsContainerRef}
               className="cards-3d"

@@ -41,7 +41,7 @@ export default function Navbar({ onMenuToggle, isMenuOpen, onNavCatalog }) {
         overwrite: 'auto'
       });
       // Update active section immediately for better UX
-      setActiveSection(targetId);
+      setActiveSection(targetId.replace(/^#/, ''));
     }
   };
 
@@ -128,20 +128,17 @@ export default function Navbar({ onMenuToggle, isMenuOpen, onNavCatalog }) {
           {/* HAMBURGER BUTTON (MOBILE) */}
           <button
             onClick={onMenuToggle}
-            className={`flex md:hidden flex-col gap-[5px] cursor-pointer p-1 border-none bg-transparent z-[600]`}
+            className="flex md:hidden flex-col gap-[5px] cursor-pointer p-3 rounded-full bg-white/90 border border-white/60 shadow-sm shadow-black/10 z-[600]"
             aria-label="Menu"
           >
             <span
-              className={`w-[22px] h-[1.5px] bg-white block transition-all duration-400 ease-ease ${isMenuOpen ? 'translate-y-[6.5px] rotate-[45deg]' : ''
-                }`}
+              className={`w-[22px] h-[2px] bg-brand block transition-all duration-400 ease-ease ${isMenuOpen ? 'translate-y-[6.5px] rotate-[45deg]' : ''}`}
             />
             <span
-              className={`w-[22px] h-[1.5px] bg-white block transition-all duration-300 ${isMenuOpen ? 'opacity-0 scale-x-0' : ''
-                }`}
+              className={`w-[22px] h-[2px] bg-brand block transition-all duration-300 ${isMenuOpen ? 'opacity-0 scale-x-0' : ''}`}
             />
             <span
-              className={`w-[22px] h-[1.5px] bg-white block transition-all duration-400 ease-ease ${isMenuOpen ? '-translate-y-[6.5px] rotate-[-45deg]' : ''
-                }`}
+              className={`w-[22px] h-[2px] bg-brand block transition-all duration-400 ease-ease ${isMenuOpen ? '-translate-y-[6.5px] rotate-[-45deg]' : ''}`}
             />
           </button>
         </div>

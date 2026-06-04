@@ -43,11 +43,21 @@ export default function MobileMenu({ isOpen, onClose, onNavCatalog }) {
 
       {/* Drawer Menu */}
       <div
-        className={`fixed top-0 right-0 w-[300px] max-w-full h-full bg-[#fafaf8] z-50 flex flex-col p-12 gap-8 shadow-[-10px_0_30px_rgba(11,11,15,0.05)] border-l border-paper-3 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`fixed top-0 right-0 w-full max-w-[340px] h-full bg-[#fafaf8] z-50 flex flex-col p-8 sm:p-12 gap-8 shadow-[-10px_0_30px_rgba(11,11,15,0.05)] border-l border-paper-3 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex flex-col gap-6 mt-16 font-serif text-[1.4rem]">
+        <div className="flex items-center justify-between w-full pt-4">
+          <span className="text-xs uppercase tracking-[0.35em] text-ink-3 font-semibold">Menu</span>
+          <button
+            onClick={onClose}
+            aria-label="Close menu"
+            className="w-10 h-10 rounded-full bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/20 transition-all duration-300 hover:bg-brand-h"
+          >
+            <span className="text-xl leading-none">×</span>
+          </button>
+        </div>
+        <div className="flex flex-col gap-6 mt-8 font-serif text-[1.4rem]">
           <a href="#hero" onClick={(e) => handleLinkClick(e, '#hero')} className="hover:text-brand transition-colors text-ink">Home</a>
           
 

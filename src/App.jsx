@@ -44,6 +44,13 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isMenuOpen]);
+
   const isHardwareRoute = currentHash.toLowerCase().includes('hardware') ||
     currentPath.toLowerCase().includes('hardware');
 

@@ -174,7 +174,7 @@ export default function Services() {
             return (
               <div
                 key={index}
-                className="service-card relative group/card [perspective:1000px] min-h-[380px]"
+                className="service-card relative group/card [perspective:1000px] min-h-[440px] sm:min-h-[420px]"
               >
                 {/* 3D Flip Container */}
                 <div className={`relative w-full h-full transition-transform duration-[600ms] [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
@@ -206,7 +206,7 @@ export default function Services() {
                       {/* Hover arrow indicator - Click to flip */}
                       <button
                         onClick={(e) => toggleFlip(index, e)}
-                        className="absolute -top-2 -right-2 w-10 h-10 border-[1.5px] border-paper-3 rounded-full flex items-center justify-center opacity-0 scale-50 -rotate-45 group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:rotate-0 transition-all duration-[400ms] ease-ease-back hover:bg-brand hover:border-brand hover:text-white cursor-pointer z-20"
+                        className="absolute -top-2 -right-2 w-11 h-11 border-[1.5px] border-paper-3 rounded-full flex items-center justify-center opacity-100 scale-100 rotate-0 md:opacity-0 md:scale-50 md:-rotate-45 md:group-hover/card:opacity-100 md:group-hover/card:scale-100 md:group-hover/card:rotate-0 transition-all duration-[400ms] ease-ease-back hover:bg-brand hover:border-brand hover:text-white cursor-pointer z-20"
                         title="Click to view more details"
                       >
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -227,7 +227,7 @@ export default function Services() {
                       </p>
                       <button
                         onClick={(e) => toggleFlip(index, e)}
-                        className="mt-6 px-5 py-2 bg-white/20 hover:bg-white/30 border border-white/30 rounded-full transition-colors text-xs font-semibold flex items-center gap-2 cursor-pointer"
+                        className="mt-6 px-6 py-3 bg-white/20 hover:bg-white/30 border border-white/30 rounded-full transition-colors text-sm font-semibold flex items-center gap-2 cursor-pointer"
                       >
                         <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5M12 19l-7-7 7-7" />

@@ -44,7 +44,7 @@ const PremiumObject = () => {
   return (
     <Float speed={2} rotationIntensity={1} floatIntensity={1.5} floatingRange={[-0.1, 0.1]}>
       <mesh ref={meshRef} castShadow receiveShadow>
-        <icosahedronGeometry args={[0.9, 0]} />
+        <icosahedronGeometry args={[1.2, 0]} />
         <meshPhysicalMaterial 
           color="#06A3DA" 
           emissive="#06A3DA" 
@@ -152,9 +152,8 @@ const ResponsiveScene = () => {
     }
   });
 
-  // Calculate safe scale. If viewport is narrow (e.g., mobile), scale down proportionately.
-  // 9.0 is roughly the width needed to fit a radius of 3.2 orbit safely.
-  const scale = Math.min(1, viewport.width / 9.0);
+  // Increase the scene scale on narrower screens so the 3D object stays prominent.
+  const scale = viewport.width < 7 ? 1.1 : Math.min(1.2, viewport.width / 7.5);
 
   return (
     <group scale={scale} ref={groupRef}>
