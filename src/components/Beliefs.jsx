@@ -187,12 +187,9 @@ export default function Beliefs() {
                     `}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isCenter ? 'bg-brand-light text-brand' : 'bg-paper-2 text-ink-3'}`}>
+                      <div className={`w-15 h-15 rounded-lg flex items-center justify-center flex-shrink-0 ${isCenter ? 'bg-brand-light text-brand' : 'bg-paper-2 text-ink-3'}`}>
                         {item.icon}
                       </div>
-                      <span className="text-[0.65rem] font-mono font-bold text-ink-3/70 tracking-widest">
-                        {String(dataIdx + 1).padStart(2, '0')} / {String(totalCards).padStart(2, '0')}
-                      </span>
                     </div>
 
                     <div className="flex-1">

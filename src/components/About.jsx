@@ -8,7 +8,7 @@ const metricsData = [
   { n: '10+', l: 'Apps live on stores' },
   { n: '50+', l: 'Worldwide clients' },
   { n: '99%', l: 'Upwork success score' },
-  { n: '10/5', l: 'Support availability' }
+  { n: '24/7', l: 'Support availability' }
 ];
 
 export default function About() {

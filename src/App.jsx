@@ -93,6 +93,7 @@ export default function App() {
         <Stats />
         {/* 4. About - Who we are */}
         <About />
+        <Beliefs />
         {/* 5. Services - 4 service cards (Web, Mobile, UX, Digital Marketing) */}
         <Services />
         {/* 6. WhyChooseUs - 3D card section */}
