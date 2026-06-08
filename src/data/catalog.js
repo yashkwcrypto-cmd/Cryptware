@@ -723,20 +723,101 @@ export const catalogData = [
   },
   {
     "id": "e-commerce-erp-template",
-    "title": "E-commerce ERP Template",
+    "title": "ERP - Cryptware Infotech",
     "category": "industries",
     "subcategory": "templates",
-    "description": "In today's fast-paced digital world, a successful eCommerce business relies on various channels to sell goods to end customers. Managing multiple platforms independently is an impossible job for businesses striving to offer the best prices and swift delivery. That's why choosing our unified eCommerce ERP business solution is the right choice. It not only helps you manage your various shop fronts, including third-party marketplaces, from a single point of access but also supports full automation of your order management, real-time inventory synchronization, and logistics operations to achieve higher efficiency and unmatched customer satisfaction.",
-    "img": "/assets/img/Industries/ecommerce-erp-industry-template.jpg",
+    "description": "This premium ERP product helps businesses run their daily operations in one place. It supports two working styles: Warehouse and inventory operations (WMS), and Billing and invoice operations (Billing). It is built for teams who want better control over purchasing, stock movement, sales fulfillment, invoicing, profit tracking, and team accountability. In simple words, this system helps a business buy better, sell faster, track stock clearly, and make better decisions with real numbers.",
+    "img": "/assets/img/erp.png",
     "specs": [
-      "Multi-Channel Order Management & Sync",
-      "Real-Time Inventory & Warehouse Tracking",
-      "Integrated Point of Sale (POS) & Marketplace APIs",
-      "Automated Shipping, Logistics & Fulfillment",
-      "Comprehensive CRM & Loyalty Programs",
-      "Financial Consolidation & Analytics Reporting"
+      "Warehouse and inventory operations (WMS)",
+      "Billing and invoice operations (Billing)",
+      "Purchasing & Vendor Management",
+      "Stock movement & Conversion",
+      "Sales Fulfillment & Invoicing",
+      "Profit tracking & Team accountability"
     ],
-    "type": "software"
+    "type": "software",
+    "workingStyles": [
+      {
+        "name": "Warehouse & Inventory Operations (WMS)",
+        "icon": "warehouse",
+        "desc": "Optimize bulk and loose stock movement, monitor rack placements, and track stock conversions dynamically."
+      },
+      {
+        "name": "Billing & Invoice Operations (Billing)",
+        "icon": "billing",
+        "desc": "Handle order-to-cash lifecycle, tax invoice records, delivery documentation, and payments smoothly."
+      }
+    ],
+    "whoShouldUse": [
+      { "team": "Business Owner", "help": "Sees stock, sales, and profit clearly in one dashboard" },
+      { "team": "Operations Team", "help": "Manages purchase, stock movement, conversion, and dispatch" },
+      { "team": "Sales Team", "help": "Creates quotations, sales orders, and closes customer orders faster" },
+      { "team": "Accounts Team", "help": "Tracks invoices, expenses, pending payments, and profitability" },
+      { "team": "Admin Team", "help": "Controls users, access, printer setup, and system activity logs" }
+    ],
+    "features": [
+      {
+        "name": "Dashboard",
+        "icon": "dashboard",
+        "what": "Open one screen to see today's purchase, today's sales, stock, low-stock alerts, revenue, and profit.",
+        "benefit": "Faster decisions without waiting for manual reports. Management can spot risks and opportunities early."
+      },
+      {
+        "name": "Master Setup (Business Foundation)",
+        "icon": "setup",
+        "what": "Create and manage key master data like products, customers, suppliers, categories, warehouse, racks, size, units, and brands.",
+        "benefit": "Clean and consistent data. Fewer mistakes in purchasing, stock, and sales entries."
+      },
+      {
+        "name": "Purchase Management",
+        "icon": "purchase",
+        "what": "Add purchase entries as bulk or loose stock. Link purchases to suppliers and products. Print barcodes/labels.",
+        "benefit": "Better stock visibility from day one. Faster receiving process and easier item tracking."
+      },
+      {
+        "name": "Purchase Orders",
+        "icon": "orders",
+        "what": "Create and track purchase orders for suppliers. Monitor order status and keep records.",
+        "benefit": "Better vendor planning. Reduces missed or delayed procurements."
+      },
+      {
+        "name": "Sales Management (Sales + Order + Quotation)",
+        "icon": "sales",
+        "what": "Create quotations for customers. Track sales order lifecycle: Quotation → Draft → Confirm → Dispatch → Fulfill → Close. Dispatch items and close payment.",
+        "benefit": "Clear order tracking from lead to payment. Better customer service and fewer fulfillment delays."
+      },
+      {
+        "name": "Sales Invoices",
+        "icon": "invoice",
+        "what": "Create and manage sales invoices. Maintain delivery and tax invoice records.",
+        "benefit": "Accurate billing and better financial control. Clear invoice history for follow-up and audits."
+      },
+      {
+        "name": "Inventory Management",
+        "icon": "inventory",
+        "what": "Move stock between warehouse and rack. Convert bulk stock into loose stock. Check product price and available stock instantly.",
+        "benefit": "Better stock utilization. Less dead stock and fewer stock-out situations."
+      },
+      {
+        "name": "Expense Tracking",
+        "icon": "expense",
+        "what": "Record and manage business expenses for complete cost visibility.",
+        "benefit": "Complete cost visibility. Better profit and margin understanding."
+      },
+      {
+        "name": "Reports and Ledgers",
+        "icon": "reports",
+        "what": "View stock report, purchase report, sales report, stock movement report, customer ledger, supplier ledger, and P&L report.",
+        "benefit": "Ready insights for review meetings. Faster business decisions based on facts, not assumptions."
+      },
+      {
+        "name": "Administration and Control",
+        "icon": "admin",
+        "what": "Manage users and permissions, configure currency and printer settings, change password, and review audit logs.",
+        "benefit": "Better security and accountability. Controlled access and clean operations."
+      }
+    ]
   },
   {
     "id": "professional-service-template",
@@ -775,6 +856,46 @@ export const catalogData = [
     "subcategory": "templates",
     "description": "Oil and Gas ERP solution supports the digital transformation in oil and gas exploration, refining, processing, and distribution. By combining the utilization of new technologies, digitally enabled and connected processes, and real-time data you can reduce risk, increase efficiency, and make better-informed decisions. Our Oil and Gas ERP solution helps you simplify and optimize connected processes, extending beyond a single enterprise to create a digital energy network. Creating multiple sets of books for financial consolidation across countries and currencies was never easier!",
     "img": "/assets/img/Industries/Oil-and-Gas-ERP-industry-template.jpg",
+    "specs": null,
+    "type": "software"
+  },
+  {
+    "id": "manufacturing-erp-template",
+    "title": "Manufacturing ERP Template",
+    "category": "industries",
+    "subcategory": "templates",
+    "description": "",
+    "img": "",
+    "specs": null,
+    "type": "software"
+  },
+  {
+    "id": "retail-pos-erp-template",
+    "title": "Retail POS ERP Template",
+    "category": "industries",
+    "subcategory": "templates",
+    "description": "",
+    "img": "",
+    "specs": null,
+    "type": "software"
+  },
+  {
+    "id": "healthcare-erp-template",
+    "title": "Healthcare Management ERP",
+    "category": "industries",
+    "subcategory": "templates",
+    "description": "",
+    "img": "",
+    "specs": null,
+    "type": "software"
+  },
+  {
+    "id": "education-erp-template",
+    "title": "Education & University ERP",
+    "category": "industries",
+    "subcategory": "templates",
+    "description": "",
+    "img": "",
     "specs": null,
     "type": "software"
   }

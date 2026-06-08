@@ -32,7 +32,7 @@ export default function TechLogos() {
       </div>
       <div
         className="flex gap-0 whitespace-nowrap"
-        style={{ animation: 'marquee 35s linear infinite' }}
+        style={{ animation: 'marquee 35s linear infinite', willChange: 'transform' }}
       >
         {doubleLogos.map((logo, idx) => (
           <div
@@ -42,6 +42,8 @@ export default function TechLogos() {
             <img
               src={logo.src}
               alt={logo.alt}
+              loading="lazy"
+              decoding="async"
               className="h-12 object-contain"
               onError={(e) => {
                 e.target.style.display = 'none';

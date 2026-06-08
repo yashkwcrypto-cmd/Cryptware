@@ -106,32 +106,38 @@ export default function WhyChooseUs() {
     const cardsContainer = cardsContainerRef.current;
     const cards = cardRefs.current;
 
+    let rafId = null;
+
     const handleMouseMove = (e) => {
-      if (!cardsContainer) return;
-      const rect = cardsContainer.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const rx = ((e.clientY - cy) / rect.height) * 16;
-      const ry = -((e.clientX - cx) / rect.width) * 16;
+      if (rafId) return; // Already have a frame queued — skip
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (!cardsContainer) return;
+        const rect = cardsContainer.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const rx = ((e.clientY - cy) / rect.height) * 16;
+        const ry = -((e.clientX - cx) / rect.width) * 16;
 
-      gsap.to(cardsContainer, {
-        rotateX: rx,
-        rotateY: ry,
-        duration: 0.5,
-        ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        transformPerspective: 800,
-        overwrite: 'auto'
-      });
-
-      cards.forEach((card, i) => {
-        if (!card) return;
-        const depth = (i + 1) * 8;
-        gsap.to(card, {
-          x: ry * depth * 0.02,
-          y: -rx * depth * 0.02,
+        gsap.to(cardsContainer, {
+          rotateX: rx,
+          rotateY: ry,
           duration: 0.5,
-          ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          ease: 'power2.out',
+          transformPerspective: 800,
           overwrite: 'auto'
+        });
+
+        cards.forEach((card, i) => {
+          if (!card) return;
+          const depth = (i + 1) * 8;
+          gsap.to(card, {
+            x: ry * depth * 0.02,
+            y: -rx * depth * 0.02,
+            duration: 0.5,
+            ease: 'power2.out',
+            overwrite: 'auto'
+          });
         });
       });
     };

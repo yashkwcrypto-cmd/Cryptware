@@ -17,7 +17,6 @@ import Testimonials from './components/Testimonials';
 import Pricing from './components/Pricing';
 import Catalog from './components/Catalog';
 import Contact from './components/Contact';
-import CTA from './components/CTA';
 import Footer from './components/Footer';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
@@ -117,14 +116,12 @@ export default function App() {
         <Benefits />
         {/* 10. Hire Developers - Dark section with roles & engagement models */}
         {!isHardwareRoute && <HireDevelopers />}
-        {/* 11. Testimonials - Client reviews */}
-        <Testimonials />
         {/* 13. Pricing - Crypto Accounting Silver/Gold plans */}
         {!isHardwareRoute && <Pricing />}
-        {/* 14. Contact - Form + Map */}
+        {/* 14. Contact - Form + Map + CTA merged */}
         <Contact initialMessage={inquiryMessage} />
-        {/* 15. CTA - Final call to action */}
-        <CTA />
+        {/* 11. Testimonials - Client reviews */}
+        <Testimonials />
       </main>
 
       {/* Footer Layer */}

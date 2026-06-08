@@ -6,96 +6,89 @@ export default function CustomCursor() {
   const ringRef = useRef(null);
 
   useEffect(() => {
+    // Skip entirely on touch devices — cursor is irrelevant there
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
     let mx = 0, my = 0;
     let rx = 0, ry = 0;
+    let animationFrameId;
+    let isHovered = false;
 
+    // Dot follows mouse instantly via direct style — zero GSAP overhead
     const onMouseMove = (e) => {
       mx = e.clientX;
       my = e.clientY;
       if (dotRef.current) {
-        dotRef.current.style.left = `${mx}px`;
-        dotRef.current.style.top = `${my}px`;
+        dotRef.current.style.transform = `translate(${mx}px, ${my}px)`;
       }
     };
 
-    window.addEventListener('mousemove', onMouseMove);
-
-    let animationFrameId;
+    // Ring lerps in rAF loop — smooth trailing effect
     const animRing = () => {
       rx += (mx - rx) * 0.12;
       ry += (my - ry) * 0.12;
       if (ringRef.current) {
-        ringRef.current.style.left = `${rx}px`;
-        ringRef.current.style.top = `${ry}px`;
+        ringRef.current.style.transform = `translate(${rx}px, ${ry}px)`;
       }
       animationFrameId = requestAnimationFrame(animRing);
     };
     animRing();
 
-    const onMouseEnter = () => {
-      if (ringRef.current) {
-        gsap.to(ringRef.current, {
-          width: 64,
-          height: 64,
-          borderColor: 'rgba(6,163,218,0.6)',
-          duration: 0.35,
-          ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          overwrite: 'auto'
-        });
-      }
-    };
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
 
-    const onMouseLeave = () => {
-      if (ringRef.current) {
-        gsap.to(ringRef.current, {
-          width: 40,
-          height: 40,
-          borderColor: 'rgba(255,255,255,0.5)',
-          duration: 0.35,
-          ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          overwrite: 'auto'
-        });
-      }
-    };
-
-    const setupListeners = () => {
-      const targets = document.querySelectorAll('a, button, .service-card, .belief-card, .metric-box, .provide-item, .contact-pill, .testi-mark');
-      targets.forEach(el => {
-        el.addEventListener('mouseenter', onMouseEnter);
-        el.addEventListener('mouseleave', onMouseLeave);
+    // Event delegation: ONE listener on document instead of hundreds per element
+    // This completely eliminates the duplicate-listener bug from the old MutationObserver approach
+    const onEnter = (e) => {
+      if (isHovered) return;
+      const el = e.target.closest('a, button, [role="button"]');
+      if (!el) return;
+      isHovered = true;
+      gsap.to(ringRef.current, {
+        scale: 1.6,
+        borderColor: 'rgba(6,163,218,0.6)',
+        duration: 0.3,
+        ease: 'power2.out',
+        overwrite: 'auto'
       });
     };
 
-    setupListeners();
+    const onLeave = (e) => {
+      if (!isHovered) return;
+      const el = e.target.closest('a, button, [role="button"]');
+      if (!el) return;
+      isHovered = false;
+      gsap.to(ringRef.current, {
+        scale: 1,
+        borderColor: 'rgba(255,255,255,0.5)',
+        duration: 0.3,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+    };
 
-    // Use MutationObserver to handle hover listeners on dynamically rendered elements
-    const observer = new MutationObserver(() => {
-      setupListeners();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    document.addEventListener('mouseover', onEnter, { passive: true });
+    document.addEventListener('mouseout', onLeave, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseover', onEnter);
+      document.removeEventListener('mouseout', onLeave);
       cancelAnimationFrame(animationFrameId);
-      observer.disconnect();
-      const targets = document.querySelectorAll('a, button, .service-card, .belief-card, .metric-box, .provide-item, .contact-pill, .testi-mark');
-      targets.forEach(el => {
-        el.removeEventListener('mouseenter', onMouseEnter);
-        el.removeEventListener('mouseleave', onMouseLeave);
-      });
     };
   }, []);
 
   return (
-    <div className="hidden md:block fixed pointer-events-none z-[9999] mix-blend-difference">
+    // Position at top-left; translate handles actual position — avoids offsetting by half size in CSS
+    <div className="hidden md:block fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference">
       <div
         ref={dotRef}
-        className="w-2 h-2 bg-white rounded-full absolute -translate-x-1/2 -translate-y-1/2 transition-transform duration-100 pointer-events-none"
+        style={{ willChange: 'transform', marginLeft: '-4px', marginTop: '-4px' }}
+        className="w-2 h-2 bg-white rounded-full absolute pointer-events-none"
       />
       <div
         ref={ringRef}
-        className="w-10 h-10 border-[1.5px] border-white/50 rounded-full absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-        style={{ transition: 'width 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), height 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)' }}
+        style={{ willChange: 'transform', marginLeft: '-20px', marginTop: '-20px' }}
+        className="w-10 h-10 border-[1.5px] border-white/50 rounded-full absolute pointer-events-none"
       />
     </div>
   );

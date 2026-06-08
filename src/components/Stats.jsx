@@ -5,19 +5,25 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 // ─── animated counter hook ───────────────────────────────────────────────────
-function useCountUp(target, duration = 2000, trigger) {
+// rAF-based counter — frame-accurate, no main thread blocking
+function useCountUp(target, duration = 1800, trigger) {
   const [count, setCount] = useState(0);
   useEffect(() => {
     if (!trigger) return;
-    let start = 0;
     const end = parseInt(target, 10);
-    const step = Math.ceil(end / (duration / 16));
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= end) { setCount(end); clearInterval(timer); }
-      else setCount(start);
-    }, 16);
-    return () => clearInterval(timer);
+    let startTime = null;
+    let rafId;
+    const step = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      // Ease-out quad for a natural deceleration
+      const eased = 1 - (1 - progress) * (1 - progress);
+      setCount(Math.floor(eased * end));
+      if (progress < 1) rafId = requestAnimationFrame(step);
+      else setCount(end);
+    };
+    rafId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafId);
   }, [trigger, target, duration]);
   return count;
 }

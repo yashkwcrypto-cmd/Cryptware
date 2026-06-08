@@ -30,6 +30,40 @@ const subcategoryNames = {
   'templates': 'ERP Templates'
 };
 
+const FeatureIcon = ({ name, className = "" }) => {
+  const icons = {
+    warehouse: <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
+    billing: <><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 14h-8"/><path d="M16 10h-8"/><path d="M10 6h-2"/></>,
+    dashboard: <><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></>,
+    setup: <><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></>,
+    purchase: <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
+    orders: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></>,
+    sales: <><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></>,
+    invoice: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="13" r="2"/><path d="M14 13h4"/><path d="M14 17h4"/><circle cx="10" cy="17" r="2"/></>,
+    inventory: <><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></>,
+    expense: <><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></>,
+    reports: <><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-5 5"/></>,
+    admin: <><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>
+  };
+
+  const selectedPath = icons[name];
+  if (!selectedPath) return <span className={className}>{name}</span>;
+
+  return (
+    <svg 
+      className={className} 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="1.5" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      viewBox="0 0 24 24"
+    >
+      {selectedPath}
+    </svg>
+  );
+};
+
 export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequest }) {
   const [localCategory, setLocalCategory] = useState('hardware');
   const cat = activeCategory || localCategory;
@@ -38,6 +72,7 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
   const [activeSubcategory, setActiveSubcategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
+  const [expandedFeatureIndex, setExpandedFeatureIndex] = useState(null);
 
   // New state for Software Tabs
   const [softwareTab, setSoftwareTab] = useState('erp'); // 'erp', 'cloud', 'services'
@@ -67,12 +102,14 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
       return catalogData.filter(item => {
         // Fix for data typo where an ERP template has hardware type
         const isSoftwareItem = item.type === 'software' || item.subcategory === 'templates' || item.subcategory === 'textiles';
-        const hasContent = item.description.length > 5;
+        const hasContent = item.description && item.description.length > 5;
         
-        if (!isSoftwareItem || !hasContent) return false;
+        // Allow templates without content to pass
+        if (!isSoftwareItem || (!hasContent && item.subcategory !== 'templates')) return false;
 
         const searchLower = searchQuery.toLowerCase();
-        const matchesSearch = item.title.toLowerCase().includes(searchLower) || item.description.toLowerCase().includes(searchLower);
+        const itemDesc = item.description || "";
+        const matchesSearch = item.title.toLowerCase().includes(searchLower) || itemDesc.toLowerCase().includes(searchLower);
         if (!matchesSearch) return false;
 
         if (softwareTab === 'erp') {
@@ -111,14 +148,15 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
   // GSAP animation for opening detail panel
   const handleOpenDetail = (item) => {
     setSelectedItem(item);
+    setExpandedFeatureIndex(null);
 
     // Animate overlay & drawer sliding in
     setTimeout(() => {
       if (overlayRef.current && detailPanelRef.current) {
         gsap.to(overlayRef.current, { opacity: 1, duration: 0.35, ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' });
         gsap.fromTo(detailPanelRef.current,
-          { xPercent: 100 },
-          { xPercent: 0, duration: 0.45, ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }
         );
       }
     }, 50);
@@ -129,8 +167,9 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
     if (overlayRef.current && detailPanelRef.current) {
       gsap.to(overlayRef.current, { opacity: 0, duration: 0.3, ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' });
       gsap.to(detailPanelRef.current, {
-        xPercent: 100,
-        duration: 0.4,
+        y: 50,
+        opacity: 0,
+        duration: 0.3,
         ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         onComplete: () => setSelectedItem(null)
       });
@@ -326,23 +365,46 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
                 ) : (
                   <>
                     {/* Software specific layout */}
-                    <div className="p-8 flex-1 flex flex-col relative bg-gradient-to-br from-white to-paper-2">
-                      <div className="w-14 h-14 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-inner relative z-10 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
-                        <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
-                        </svg>
+                    {item.img && (
+                      <div className="h-[220px] relative bg-paper-2 overflow-hidden border-b border-paper-3/20">
+                        <img
+                          src={item.img}
+                          alt={item.title}
+                          className="w-full h-full object-cover object-top filter group-hover:scale-105 transition-transform duration-700"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                        <span className="absolute top-4 right-4 text-ink text-[0.55rem] tracking-widest uppercase font-bold px-2 py-0.5 bg-white/95 backdrop-blur-sm border border-paper-3/50 rounded shadow-sm z-10">
+                          {subcategoryNames[item.subcategory] || item.subcategory}
+                        </span>
                       </div>
-                      <span className="absolute top-8 right-8 text-ink-3 text-[0.65rem] tracking-widest uppercase font-bold px-2.5 py-1 bg-white border border-paper-3/60 rounded shadow-sm">
-                        {subcategoryNames[item.subcategory] || item.subcategory}
-                      </span>
-                      <h3 className="font-serif text-[1.3rem] leading-tight text-ink font-normal mb-3 group-hover:text-brand transition-colors relative z-10">
+                    )}
+                    <div className={`p-8 flex-1 flex flex-col relative bg-gradient-to-br from-white to-paper-2 ${!item.description ? 'items-center justify-center text-center' : ''}`}>
+                      {!item.img && (
+                        <>
+                          {!item.description ? (
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 rounded-bl-full -z-10 group-hover:bg-brand/10 transition-colors duration-500" />
+                          ) : (
+                            <div className="w-14 h-14 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mb-6 shadow-inner relative z-10 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
+                              <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+                              </svg>
+                            </div>
+                          )}
+                          <span className={`absolute ${item.description ? 'top-8 right-8' : 'top-4 right-4'} text-ink-3 text-[0.55rem] tracking-widest uppercase font-bold px-2 py-0.5 bg-white border border-paper-3/60 rounded shadow-sm`}>
+                            {subcategoryNames[item.subcategory] || item.subcategory}
+                          </span>
+                        </>
+                      )}
+                      <h3 className={`font-serif leading-tight text-ink font-normal group-hover:text-brand transition-colors relative z-10 ${!item.description ? 'text-[1.5rem] mb-6 mt-4' : 'text-[1.3rem] mb-3'}`}>
                         {item.title}
                       </h3>
-                      <p className="text-[0.9rem] text-ink-3 leading-relaxed line-clamp-4 relative z-10">
-                        {item.description}
-                      </p>
+                      {item.description && (
+                        <p className="text-[0.9rem] text-ink-3 leading-relaxed line-clamp-4 relative z-10">
+                          {item.description}
+                        </p>
+                      )}
                       
-                      <div className="mt-8 flex items-center gap-2 text-brand text-[0.8rem] font-bold tracking-wider uppercase group-hover:gap-3 transition-all relative z-10">
+                      <div className={`mt-auto flex items-center gap-2 text-brand text-[0.8rem] font-bold tracking-wider uppercase group-hover:gap-3 transition-all relative z-10 ${!item.description ? 'justify-center w-[80%] border border-brand/20 py-3 rounded-full hover:bg-brand/5 shadow-sm mt-4' : 'mt-8'}`}>
                         Learn More
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -350,7 +412,9 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
                       </div>
                       
                       {/* Decorative background element */}
-                      <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-brand/5 rounded-full blur-2xl group-hover:bg-brand/10 transition-colors duration-500"></div>
+                      {item.description && (
+                        <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-brand/5 rounded-full blur-2xl group-hover:bg-brand/10 transition-colors duration-500"></div>
+                      )}
                     </div>
                   </>
                 )}
@@ -380,7 +444,7 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
       {/* GORGEOUS DETAILS SIDE DRAWER / PANEL */}
       {/* ========================================================================= */}
       {selectedItem && (
-        <div className="fixed inset-0 z-[100] flex justify-end">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
 
           {/* Blackout overlay backdrop */}
           <div
@@ -389,10 +453,11 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
             className="absolute inset-0 bg-ink/70 backdrop-blur-sm opacity-0 transition-opacity"
           />
 
-          {/* Slide-in Drawer Container */}
+          {/* Centered Modal Container */}
           <div
             ref={detailPanelRef}
-            className="relative w-full max-w-[580px] h-full bg-white shadow-[-10px_0_40px_rgba(0,0,0,0.15)] flex flex-col z-10 translate-x-full overflow-hidden"
+            style={{ transform: 'translateY(50px)', opacity: 0 }}
+            className="relative w-full max-w-[850px] max-h-[92vh] rounded-3xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.2)] flex flex-col z-10 overflow-hidden"
           >
             {/* Drawer Header Sticky */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-paper-3/40 sticky top-0 bg-white z-20">
@@ -457,6 +522,109 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
                 </div>
               )}
 
+              {/* Working Styles */}
+              {selectedItem.workingStyles && (
+                <div className="space-y-4">
+                  <h4 className="font-sans text-[0.85rem] tracking-wider uppercase font-bold text-ink">
+                    Working Styles
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {selectedItem.workingStyles.map((style, idx) => (
+                      <div key={idx} className="relative bg-gradient-to-br from-paper-2 to-white/50 backdrop-blur-sm border border-paper-3/50 rounded-2xl p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 z-10 overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-brand/5 rounded-bl-full -z-10 group-hover:bg-brand/10 transition-colors" />
+                        <FeatureIcon name={style.icon} className="w-8 h-8 text-brand mb-4" />
+                        <h5 className="font-semibold text-[0.95rem] text-ink mb-1.5 leading-tight">{style.name}</h5>
+                        <p className="text-[0.825rem] text-ink-2 leading-relaxed">{style.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Target Audience / Teams */}
+              {selectedItem.whoShouldUse && (
+                <div className="space-y-4">
+                  <h4 className="font-sans text-[0.85rem] tracking-wider uppercase font-bold text-ink">
+                    Who Should Use This?
+                  </h4>
+                  <div className="bg-white border border-paper-3/40 shadow-sm rounded-2xl p-3 space-y-1">
+                    {selectedItem.whoShouldUse.map((row, idx) => (
+                      <div key={idx} className="flex gap-4 items-center p-3 rounded-xl hover:bg-paper-2/60 transition-colors">
+                        <span className="inline-flex items-center px-3 py-2 rounded-lg text-[0.7rem] font-bold tracking-widest uppercase bg-gradient-to-r from-brand/10 to-brand/5 text-brand min-w-[140px] justify-center text-center border border-brand/10 shadow-sm">
+                          {row.team}
+                        </span>
+                        <p className="text-[0.85rem] text-ink-2 leading-relaxed">{row.help}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Interactive Features Accordion */}
+              {selectedItem.features && (
+                <div className="space-y-4">
+                  <h4 className="font-sans text-[0.85rem] tracking-wider uppercase font-bold text-ink">
+                    Features Overview
+                  </h4>
+                  <div className="space-y-3">
+                    {selectedItem.features.map((feature, idx) => {
+                      const isOpen = expandedFeatureIndex === idx;
+                      return (
+                        <div key={idx} className={`border rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? 'border-brand/30 shadow-md bg-gradient-to-b from-brand/[0.02] to-transparent' : 'border-paper-3/40 bg-white hover:border-brand/20'}`}>
+                          {/* Accordion Trigger */}
+                          <button
+                            onClick={() => setExpandedFeatureIndex(isOpen ? null : idx)}
+                            className="w-full text-left px-5 py-4 flex items-center justify-between transition-colors cursor-pointer group"
+                          >
+                            <div className="flex items-center gap-3.5">
+                              <div className={`p-2 rounded-xl transition-colors ${isOpen ? 'bg-brand/10 text-brand' : 'bg-paper-2 text-ink-3 group-hover:text-brand'}`}>
+                                <FeatureIcon name={feature.icon} className="w-5 h-5" />
+                              </div>
+                              <span className={`font-semibold text-[0.95rem] transition-colors ${isOpen ? 'text-brand' : 'text-ink'}`}>{feature.name}</span>
+                            </div>
+                            <svg
+                              className={`w-5 h-5 text-ink-3 transition-transform duration-300 ${isOpen ? 'rotate-180 text-brand' : ''}`}
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                          </button>
+
+                          {/* Accordion Content */}
+                          <div
+                            className={`transition-all duration-300 overflow-hidden ${
+                              isOpen ? 'max-h-[300px] border-t border-paper-3/10 bg-paper-2/20' : 'max-h-0'
+                            }`}
+                          >
+                            <div className="px-5 py-4 space-y-3">
+                              <div>
+                                <span className="block text-[0.7rem] uppercase font-bold text-ink-3 tracking-wider mb-1">
+                                  What users do
+                                </span>
+                                <p className="text-[0.85rem] text-ink-2 leading-relaxed">
+                                  {feature.what}
+                                </p>
+                              </div>
+                              <div className="bg-[#f0f9ff]/40 border border-brand/5 rounded-xl p-3">
+                                <span className="block text-[0.7rem] uppercase font-bold text-brand tracking-wider mb-1">
+                                  Business Benefit
+                                </span>
+                                <p className="text-[0.825rem] text-ink-2 leading-relaxed">
+                                  {feature.benefit}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Business Value Info Banner */}
               <div className="bg-[#f0f9ff]/50 border border-brand/10 rounded-2xl p-5 flex items-start gap-4">
                 <span className="w-10 h-10 rounded-xl bg-brand-light flex items-center justify-center flex-shrink-0 text-brand text-xl">
@@ -468,22 +636,36 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
                 </div>
               </div>
 
+              {/* Other ERP Templates Badges */}
+              <div className="pt-6 mt-4 border-t border-paper-3/20">
+                <h4 className="font-sans text-[0.7rem] tracking-widest uppercase font-bold text-ink-3 mb-4">
+                  Also We Will Build
+                </h4>
+                <div className="flex flex-wrap gap-2.5">
+                  {catalogData.filter(item => item.subcategory === 'templates' && item.id !== selectedItem.id).map(erp => (
+                    <span key={erp.id} className="inline-flex items-center px-3 py-1.5 rounded-lg text-[0.65rem] font-bold tracking-widest uppercase bg-paper-2 text-ink-3 border border-paper-3/40 hover:bg-brand/5 hover:text-brand hover:border-brand/20 transition-colors cursor-pointer shadow-sm">
+                      {erp.title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
             </div>
 
             {/* Footer CTAs (Sticky) */}
-            <div className="px-6 py-5 border-t border-paper-3/40 bg-white grid grid-cols-2 gap-4 sticky bottom-0 z-20">
+            <div className="px-6 py-4 border-t border-paper-3/40 bg-white/90 backdrop-blur-md flex justify-end gap-3 sticky bottom-0 z-20">
               <button
                 onClick={handleCloseDetail}
-                className="text-[0.9rem] font-medium border border-paper-3 hover:bg-paper-2 text-ink px-4 py-3.5 rounded-full transition-all text-center"
+                className="text-[0.75rem] font-bold uppercase tracking-widest border border-paper-3/60 hover:border-paper-3 hover:bg-paper-2 text-ink-3 hover:text-ink px-5 py-2.5 rounded-lg transition-all"
               >
                 Go Back
               </button>
               <button
                 onClick={() => handleInquiry(selectedItem)}
-                className="text-[0.9rem] font-medium bg-brand hover:bg-brand-h text-white px-4 py-3.5 rounded-full shadow-md hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                className="text-[0.75rem] font-bold uppercase tracking-widest bg-brand hover:bg-brand-h text-white px-5 py-2.5 rounded-lg shadow-sm hover:shadow hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
               >
                 Inquire Now
-                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
               </button>

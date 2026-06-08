@@ -67,6 +67,12 @@
   }
 }
 
+/* The actual class applied by the Marquee component */
+.animate-marquee {
+  animation: marquee 35s linear infinite;
+  will-change: transform;
+}
+
 .animate-ripple {
   animation: ripple 2s ease infinite;
 }
@@ -118,14 +124,13 @@
   }
 }
 
-/* Smooth scroll animation utilities */
-html.smooth-scroll {
-  scroll-behavior: auto;
+/* Smooth scrolling - native smooth is buttery on modern browsers */
+html {
+  scroll-behavior: smooth;
 }
 
-/* Smooth scrolling optimizations */
 body, html {
-  scroll-behavior: auto;
+  scroll-behavior: smooth;
 }
 
 /* GPU acceleration for smooth animations */
@@ -134,11 +139,18 @@ body, html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Optimize for animations */
-button, a, [role="button"] {
-  will-change: transform, opacity, box-shadow;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+/* Only promote elements that ACTUALLY animate frequently to GPU layers */
+/* Never apply will-change globally — it wastes GPU memory */
+.whatsapp-float,
+.animate-marquee,
+[data-marquee] {
+  will-change: transform;
+}
+
+/* CSS Containment: prevent layout/paint recalculations cascading across sections */
+/* This is the single biggest win for scroll jank on complex pages */
+section {
+  contain: layout style;
 }
 
 /* Navbar animations */

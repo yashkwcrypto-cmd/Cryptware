@@ -54,14 +54,13 @@ export default function Navbar({ onMenuToggle, isMenuOpen, onNavCatalog }) {
         <a
           href="#"
           onClick={(e) => handleLinkClick(e, '#hero')}
-          className="flex items-center gap-[0.7rem] font-serif text-[1.4rem] tracking-tight text-white z-10"
+          className="flex items-center z-10 h-full"
         >
-          <div className="w-9 h-9 bg-brand rounded-xl flex items-center justify-center flex-shrink-0 relative overflow-hidden shadow-lg shadow-brand/20">
-            <svg className="w-[20px] h-[20px] stroke-white stroke-[2.5]" fill="none" viewBox="0 0 24 24">
-              <path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <span className="font-bold tracking-tight text-[#214177]">Cryptware</span>
+          <img
+            src="/assets/img/logo-removebg-preview.png"
+            alt="Cryptware Infotech Logo"
+            className="h-[44px] md:h-[50px] w-auto object-contain"
+          />
         </a>
 
         {/* DESKTOP NAV LINKS - Centered absolutely */}

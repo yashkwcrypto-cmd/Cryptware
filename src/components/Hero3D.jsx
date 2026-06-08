@@ -59,6 +59,8 @@ const PremiumObject = () => {
   );
 };
 
+const _scale = new THREE.Vector3();
+
 const TechBlock = ({ position, text, color, logoUrl }) => {
   const meshRef = useRef();
   const [hovered, setHovered] = useState(false);
@@ -70,8 +72,9 @@ const TechBlock = ({ position, text, color, logoUrl }) => {
     if (meshRef.current) {
       meshRef.current.rotation.y = time * 0.2;
       meshRef.current.rotation.x = time * 0.1;
+      // Reuse pre-allocated vector — no GC pressure
       const targetScale = hovered ? 1.3 : 1;
-      meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.15);
+      meshRef.current.scale.lerp(_scale.set(targetScale, targetScale, targetScale), 0.1);
     }
   });
 
@@ -168,11 +171,15 @@ const ResponsiveScene = () => {
 export default function Hero3D() {
   return (
     <div className="absolute inset-0 z-0 w-full h-full pointer-events-auto">
-      <Canvas camera={{ position: [0, 0, 8], fov: 45 }} gl={{ antialias: true, alpha: true }}>
+      <Canvas
+        camera={{ position: [0, 0, 8], fov: 45 }}
+        gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
+        dpr={[1, 1.5]}
+      >
         <ambientLight intensity={0.6} />
         <directionalLight position={[10, 10, 5]} intensity={2} color="#ffffff" castShadow />
         <directionalLight position={[-10, -10, -5]} intensity={1} color="#06A3DA" />
-        <Sparkles count={50} scale={14} size={2} speed={0.4} opacity={0.3} color="#06A3DA" />
+        <Sparkles count={30} scale={14} size={1.5} speed={0.3} opacity={0.25} color="#06A3DA" />
         
         <ResponsiveScene />
       </Canvas>

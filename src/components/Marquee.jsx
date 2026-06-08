@@ -67,8 +67,8 @@ export default function Marquee() {
   const doubleItems = [...marqueeItems, ...marqueeItems, ...marqueeItems, ...marqueeItems];
 
   return (
-    <div className="bg-paper-2 border-y border-paper-3 py-5.5 overflow-hidden w-full select-none" aria-hidden="true">
-      <div className="flex animate-marquee whitespace-nowrap w-max">
+    <div className="bg-paper-2 border-y border-paper-3 py-5.5 overflow-hidden w-full select-none" style={{ contain: 'layout paint' }} aria-hidden="true">
+      <div className="animate-marquee flex whitespace-nowrap w-max">
         {doubleItems.map((item, index) => (
           <div
             key={index}
