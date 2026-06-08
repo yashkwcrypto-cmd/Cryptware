@@ -175,7 +175,7 @@ export default function Contact({ initialMessage }) {
       <section
         ref={sectionRef}
         id="contact-us"
-        className="relative bg-ink text-white py-24 md:py-36 overflow-hidden"
+        className="relative bg-ink text-white py-24 md:py-36 overflow-hidden rounded-b-[42px]"
       >
         {/* Background grid */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.018)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.018)_1px,transparent_1px)] bg-[size:72px_72px] pointer-events-none" />

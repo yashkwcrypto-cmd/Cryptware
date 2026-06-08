@@ -61,7 +61,7 @@ export default function Testimonials() {
 
   const handleSwitch = (index) => {
     if (index === cur) return;
-    
+
     // Animate out and then in with new content
     gsap.fromTo(textGroupRef.current.children,
       { opacity: 1, y: 0 },
@@ -89,14 +89,13 @@ export default function Testimonials() {
   };
 
   return (
-    <section ref={containerRef} className="py-20 md:py-32 bg-paper flex items-center justify-center">
+    <section ref={containerRef} className="py-5 md:py-10 bg-paper flex items-center justify-center rounded-t-[32px]" >
       <div className="w-[92%] max-w-[1280px] mx-auto text-center">
-        <div className="testi-container max-w-[800px] mx-auto flex flex-col items-center gap-6">
+        {/* <div className="testi-container max-w-[800px] mx-auto flex flex-col items-center gap-6">
           <span className="testi-fade-up eyebrow text-brand tracking-widest uppercase text-xs font-semibold mb-2 block">
             What clients say
           </span>
 
-          {/* Dots Indicator */}
           <div className="testi-fade-up flex gap-3.5 mb-2">
             {testimonials.map((_, idx) => (
               <button
@@ -110,7 +109,6 @@ export default function Testimonials() {
             ))}
           </div>
 
-          {/* Star reviews */}
           <div className="testi-fade-up flex gap-1 mb-2">
             {[...Array(5)].map((_, i) => (
               <svg key={i} className="w-[18px] h-[18px] fill-brand text-brand" viewBox="0 0 24 24">
@@ -119,7 +117,6 @@ export default function Testimonials() {
             ))}
           </div>
 
-          {/* Quote & Author Group */}
           <div ref={textGroupRef} className="testi-fade-up w-full mt-2">
             <p className="testi-quote font-serif text-[clamp(1.35rem,2.5vw,2rem)] text-ink leading-relaxed font-normal min-h-[140px] flex items-center justify-center">
               {testimonials[cur].q}
@@ -129,7 +126,7 @@ export default function Testimonials() {
               <span className="text-[0.78rem] text-ink-3 tracking-wide">{testimonials[cur].t}</span>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

@@ -2,21 +2,23 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <footer className="bg-ink text-white py-16 border-t border-white/5">
+    <footer className="bg-ink text-white py-16 border-t border-white/5 rounded-t-[42px]">
       <div className="w-[92%] max-w-[1280px] mx-auto">
+        {/* FOOTER NAV BAR */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12 pt-4 pb-8 border-b border-white/5">
+          <a href="#" className="inline-block">
+            <img
+              src="/assets/img/logo-removebg-preview.png"
+              alt="Cryptware Infotech Logo"
+              className="h-[50px] md:h-[60px] w-auto object-contain"
+            />
+          </a>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-12">
           {/* BRAND COLUMN */}
           <div className="md:col-span-5 flex flex-col gap-4">
-            <div className="flex items-center gap-[0.7rem] font-serif text-[1.4rem] tracking-tight text-white">
-              <div className="w-9 h-9 bg-brand rounded-xl flex items-center justify-center flex-shrink-0 relative overflow-hidden shadow-lg shadow-brand/20">
-                <svg className="w-[20px] h-[20px] stroke-white stroke-[2.5]" fill="none" viewBox="0 0 24 24">
-                  <path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <span className="font-bold tracking-tight">Cryptware</span>
-            </div>
             <p className="text-[0.9rem] text-white/50 leading-relaxed max-w-[360px]">
-              India's trusted web, enterprise software &amp; mobile app development company. Innovation in our veins, passion in our hearts.
+              India's trusted web, enterprise software & mobile app development company. Innovation in our veins, passion in our hearts.
             </p>
             <div className="flex items-center gap-4 mt-2">
               <a
