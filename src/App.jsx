@@ -18,6 +18,7 @@ import Pricing from './components/Pricing';
 import Catalog from './components/Catalog';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import FloatingChat from './components/FloatingChat';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 
@@ -126,19 +127,7 @@ export default function App() {
 
       {/* Footer Layer */}
       <Footer />
-
-      {/* Floating WhatsApp Button */}
-      <a
-        href="https://wa.me/917490971996"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Chat on WhatsApp"
-        className="whatsapp-float"
-      >
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="white">
-          <path d="M16 3C9.37 3 4 8.37 4 15c0 2.49.73 4.81 2 6.76L4 29l7.44-2.04A12.95 12.95 0 0016 27c6.63 0 12-5.37 12-12S22.63 3 16 3zm6.28 17.28l-1.57.81a1.12 1.12 0 01-1.04-.08c-.95-.54-3.27-2.11-4.73-4.72-.68-1.22-.83-2.36-.41-3.14l.82-1.57a.83.83 0 011.19-.29l1.56 1.04a.83.83 0 01.31.99l-.44 1.1a.28.28 0 00.07.32c.48.44 1.97 1.82 2.53 2.38a.28.28 0 00.33.05l1.1-.43a.83.83 0 01.99.3l1.04 1.55a.83.83 0 01-.75 1.69z" />
-        </svg>
-      </a>
+      <FloatingChat />
     </div>
   );
 }
