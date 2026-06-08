@@ -6,7 +6,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 const checklistItems = [
   'Develop MVP & release versions frequently',
-  '160 man-hours guaranteed per month',
   'Daily reporting & weekly code delivery',
   'Direct developer access — Skype, calls, chat',
   'Flexible timezone — monthly or yearly hiring'
@@ -190,7 +189,7 @@ export default function WhyChooseUs() {
 
       <div className="w-[92%] max-w-[1280px] mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-          
+
           {/* CONTENT PANEL */}
           <div>
             <span className="why-fade-up eyebrow text-brand tracking-widest uppercase text-xs font-semibold mb-3 block">

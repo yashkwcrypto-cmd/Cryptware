@@ -9,6 +9,16 @@ const servicesData = [
     num: '01',
     title: 'Web Development',
     desc: 'End-to-end custom web applications, scalable architectures, and seamless e-commerce solutions built for real-world performance.',
+    tagline: '*Scalable Web. Built to Perform.*',
+    body: 'We architect and deliver full-stack web solutions — from high-converting landing pages to enterprise-grade SaaS platforms. Every line of code is clean, tested, and production-ready.',
+    capabilities: [
+      'Custom Web Apps & Portals',
+      'eCommerce & Payment Integration',
+      'SaaS & Multi-Tenant Platforms',
+      'REST API & Third-Party Integrations',
+      'Legacy System Modernization'
+    ],
+    techStack: ['React', 'Angular', 'Node.js', '.NET Core', 'AWS'],
     icon: (
       <svg className="w-[24px] h-[24px] stroke-brand group-hover/card:stroke-brand transition-colors duration-300" fill="none" strokeWidth="2" viewBox="0 0 24 24">
         <path d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25z" />
@@ -19,6 +29,16 @@ const servicesData = [
     num: '02',
     title: 'Mobile Apps',
     desc: 'High-end native and cross-platform apps for iOS and Android — crafted to engage users and drive meaningful, measurable conversions.',
+    tagline: '*Apps Users Love. Platforms That Scale.*',
+    body: 'We build high-performance native and cross-platform mobile apps for iOS and Android — designed for engagement, built for reliability, and optimized for growth.',
+    capabilities: [
+      'iOS & Android Native Apps',
+      'Cross-Platform with Flutter & React Native',
+      'App Store Deployment & Optimization',
+      'Push Notifications & Offline Support',
+      'API Integration & Backend Connectivity'
+    ],
+    techStack: ['Flutter', 'React Native', 'Kotlin', 'Firebase'],
     icon: (
       <svg className="w-[24px] h-[24px] stroke-brand group-hover/card:stroke-brand transition-colors duration-300" fill="none" strokeWidth="2" viewBox="0 0 24 24">
         <path d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
@@ -29,6 +49,16 @@ const servicesData = [
     num: '03',
     title: 'UI / UX Design',
     desc: 'User-centric interfaces using Figma and Adobe XD — beautiful aesthetics meeting intuitive navigation for maximum conversion.',
+    tagline: '*Design That Converts. Experience That Stays.*',
+    body: 'We craft pixel-perfect, user-first interfaces backed by research and validated through testing. Beautiful aesthetics meet intuitive flows — designed to reduce friction and maximize conversion.',
+    capabilities: [
+      'Wireframing & Prototyping',
+      'Mobile & Web UI Design',
+      'Design Systems & Component Libraries',
+      'User Research & Usability Testing',
+      'Figma Handoff to Developers'
+    ],
+    techStack: ['Figma', 'Adobe XD', 'InVision', 'Framer'],
     icon: (
       <svg className="w-[24px] h-[24px] stroke-brand group-hover/card:stroke-brand transition-colors duration-300" fill="none" strokeWidth="2" viewBox="0 0 24 24">
         <path d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
@@ -39,6 +69,16 @@ const servicesData = [
     num: '04',
     title: 'Digital Marketing',
     desc: 'Sophisticated SEO, social media, content, PPC, email & analytics expertise. Drive growth, enhance ROI, and dominate your market with data-driven strategies.',
+    tagline: '*Grow Visibility. Drive Revenue. Dominate Your Market.*',
+    body: 'We combine data, creativity, and strategy to build digital marketing campaigns that attract the right audience, generate qualified leads, and deliver measurable ROI — consistently.',
+    capabilities: [
+      'Search Engine Optimization (SEO)',
+      'Pay-Per-Click Advertising (PPC / Google Ads)',
+      'Social Media Marketing & Management',
+      'Email Marketing Campaigns',
+      'Analytics, Reporting & Conversion Optimization'
+    ],
+    techStack: ['Google Analytics', 'SEMrush', 'Meta Ads', 'HubSpot'],
     icon: (
       <svg className="w-[24px] h-[24px] stroke-brand group-hover/card:stroke-brand transition-colors duration-300" fill="none" strokeWidth="2" viewBox="0 0 24 24">
         <path d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" />
@@ -49,6 +89,16 @@ const servicesData = [
     num: '05',
     title: 'Cloud Services',
     desc: 'Secure, scalable, and high-performance cloud infrastructure, migration, and management services.',
+    tagline: '*Reliable Infrastructure. Zero Downtime. Infinite Scale.*',
+    body: 'We design, deploy, and manage secure cloud environments that keep your applications fast, available, and protected — so you can focus on building your business, not managing servers.',
+    capabilities: [
+      'Cloud Architecture & Setup (AWS / Azure)',
+      'Cloud Migration & Modernization',
+      'DevOps, CI/CD Pipeline Setup',
+      'Auto-Scaling & Load Balancing',
+      '24/7 Monitoring & Cloud Security'
+    ],
+    techStack: ['AWS', 'Microsoft Azure', 'Docker'],
     icon: (
       <svg className="w-[24px] h-[24px] stroke-brand group-hover/card:stroke-brand transition-colors duration-300" fill="none" strokeWidth="2" viewBox="0 0 24 24">
         <path d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
@@ -218,23 +268,59 @@ export default function Services() {
 
                   {/* BACK FACE */}
                   <div
-                    className={`absolute inset-0 w-full h-full bg-brand rounded-2xl p-6 xl:p-8 flex flex-col justify-center items-center text-center text-white shadow-xl [backface-visibility:hidden] [transform:rotateY(180deg)] ${isFlipped ? 'pointer-events-auto' : 'pointer-events-none'}`}
+                    className={`absolute inset-0 w-full h-full bg-gradient-to-br from-[#04202e] via-[#051e2b] to-[#071b24] rounded-2xl p-6 xl:p-7 flex flex-col justify-between text-white shadow-xl [backface-visibility:hidden] [transform:rotateY(180deg)] ${isFlipped ? 'pointer-events-auto' : 'pointer-events-none'}`}
                   >
-                    <div className="relative z-10 flex flex-col items-center">
-                      <h4 className="text-[1.1rem] font-serif mb-4">{svc.title}</h4>
-                      <p className="text-[0.85rem] text-white/90 leading-[1.6]">
-                        Detailed data about {svc.title}. We can add more specific capabilities, tech stacks, and case studies here in the future.
-                      </p>
-                      <button
-                        onClick={(e) => toggleFlip(index, e)}
-                        className="mt-6 px-6 py-3 bg-white/20 hover:bg-white/30 border border-white/30 rounded-full transition-colors text-sm font-semibold flex items-center gap-2 cursor-pointer"
-                      >
-                        <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5M12 19l-7-7 7-7" />
-                        </svg>
-                        Go Back
-                      </button>
+                    <div className="relative z-10 flex flex-col items-center overflow-y-auto max-h-full py-1 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                      <div className="w-14 h-14 rounded-2xl bg-white/[0.06] border border-white/[0.12] flex items-center justify-center mb-5 shrink-0 shadow-inner">
+                        <div className="text-white/90">
+                          {svc.icon}
+                        </div>
+                      </div>
+
+                      <h4 className="text-[1.2rem] font-serif font-medium mb-1.5 text-center text-white tracking-wide">{svc.title}</h4>
+                      <p className="text-[0.9rem] text-white/85 leading-[1.5] italic mb-5 text-center font-serif">{svc.tagline}</p>
+                      <p className="text-[0.82rem] text-white/65 leading-[1.65] mb-6 text-center">{svc.body}</p>
+
+                      <div className="w-full mb-5">
+                        <div className="flex items-center gap-3 mb-3.5">
+                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                          <p className="text-[0.68rem] uppercase tracking-[0.22em] text-white font-semibold px-2">Capabilities</p>
+                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                        </div>
+                        <div className="grid grid-cols-1 gap-2.5">
+                          {svc.capabilities.map((cap, i) => (
+                            <div key={i} className="flex items-start gap-3 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 hover:bg-white/[0.08] transition-colors duration-300">
+                              <span className="mt-[4px] w-[7px] h-[7px] rounded-full bg-brand shrink-0 shadow-[0_0_8px_rgba(6,163,218,0.5)]" />
+                              <span className="text-[0.8rem] text-white/85 leading-[1.5]">{cap}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="w-full">
+                        <div className="flex items-center gap-3 mb-3.5">
+                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                          <p className="text-[0.68rem] uppercase tracking-[0.22em] text-white font-semibold px-2">Tech Stack</p>
+                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-2.5">
+                          {svc.techStack.map((tech, i) => (
+                            <span key={i} className="px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.12] text-[0.76rem] font-medium text-white/85 backdrop-blur-md hover:bg-white/[0.12] hover:border-white/20 transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.15)]">
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
+                    <button
+                      onClick={(e) => toggleFlip(index, e)}
+                      className="mt-5 px-7 py-3.5 bg-white text-brand rounded-full transition-all duration-300 text-sm font-bold flex items-center gap-2.5 cursor-pointer shrink-0 hover:bg-white/95 hover:shadow-[0_8px_24px_rgba(255,255,255,0.15)] hover:scale-105 active:scale-95"
+                    >
+                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5M12 19l-7-7 7-7" />
+                      </svg>
+                      Go Back
+                    </button>
                   </div>
 
                 </div>
