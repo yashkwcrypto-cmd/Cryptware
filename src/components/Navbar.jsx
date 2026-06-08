@@ -63,56 +63,45 @@ export default function Navbar({ onMenuToggle, isMenuOpen, onNavCatalog }) {
           />
         </a>
 
-        {/* DESKTOP NAV LINKS - Centered absolutely */}
-        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-10">
-          <a
-            href="#about"
-            onClick={(e) => handleLinkClick(e, '#about')}
-            className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${activeSection === 'about'
-              ? 'text-[#214177] after:w-full'
-              : 'text-[#214177] after:w-0 hover:text-[#214177] hover:after:w-full'
-              }`}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 0 01 0 7.75"></path></svg>
-            About
-          </a>
-          <a
-            href="#services"
-            onClick={(e) => handleLinkClick(e, '#services')}
-            className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${activeSection === 'services'
-              ? 'text-[#214177] after:w-full'
-              : 'text-[#214177] after:w-0 hover:text-[#214177] hover:after:w-full'
-              }`}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 12 12 17 22 12" /><polyline points="2 17 12 22 22 17" /></svg>
-            Services
-          </a>
-          <a
-            href="#hire"
-            onClick={(e) => handleLinkClick(e, '#hire')}
-            className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${activeSection === 'hire'
-              ? 'text-[#214177] after:w-full'
-              : 'text-[#214177] after:w-0 hover:text-[#214177] hover:after:w-full'
-              }`}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
-            Hire Devs
-          </a>
-          <a
-            href="#pricing"
-            onClick={(e) => handleLinkClick(e, '#pricing')}
-            className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${activeSection === 'pricing'
-              ? 'text-[#214177] after:w-full'
-              : 'text-[#214177] after:w-0 hover:text-[#214177] hover:after:w-full'
-              }`}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></svg>
-            Pricing
-          </a>
-        </div>
 
-        {/* CTA & HAMBURGER - Right */}
+
+        {/* DESKTOP NAV LINKS + CTA + HAMBURGER - Right */}
         <div className="flex items-center gap-6 z-10">
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex items-center gap-8">
+            <a
+              href="#about"
+              onClick={(e) => handleLinkClick(e, '#about')}
+              className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${activeSection === 'about' ? 'text-[#214177] after:w-full' : 'text-[#214177] after:w-0 hover:text-[#214177] hover:after:w-full'}`}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 0 01 0 7.75"></path></svg>
+              About
+            </a>
+            <a
+              href="#services"
+              onClick={(e) => handleLinkClick(e, '#services')}
+              className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${activeSection === 'services' ? 'text-[#214177] after:w-full' : 'text-[#214177] after:w-0 hover:text-[#214177] hover:after:w-full'}`}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 12 12 17 22 12" /><polyline points="2 17 12 22 22 17" /></svg>
+              Services
+            </a>
+            <a
+              href="#hire"
+              onClick={(e) => handleLinkClick(e, '#hire')}
+              className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${activeSection === 'hire' ? 'text-[#214177] after:w-full' : 'text-[#214177] after:w-0 hover:text-[#214177] hover:after:w-full'}`}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
+              Hire Devs
+            </a>
+            <a
+              href="#pricing"
+              onClick={(e) => handleLinkClick(e, '#pricing')}
+              className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${activeSection === 'pricing' ? 'text-[#214177] after:w-full' : 'text-[#214177] after:w-0 hover:text-[#214177] hover:after:w-full'}`}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></svg>
+              Pricing
+            </a>
+          </div>
           <a
             href="#contact-us"
             onClick={(e) => handleLinkClick(e, '#contact-us')}
