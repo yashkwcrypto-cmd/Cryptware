@@ -86,7 +86,7 @@ export default function App() {
       {/* Section Layers */}
       <main>
         {/* 1. Hero - Full-screen landing */}
-        <Hero />
+        <Hero isHardwareRoute={isHardwareRoute} />
         {/* 2. Marquee - Scrolling text strip */}
         <Marquee />
         {/* 3. Stats - Animated counters */}
