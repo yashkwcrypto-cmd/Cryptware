@@ -1,17 +1,14 @@
 import axios from 'axios';
 import SYSTEM_PROMPT from './gemin.md?raw';
 
-// ─── API Keys ────────────────────────────────────────────────────────────────
-const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY;
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const isDev = import.meta.env.DEV;
 
 // ─── Endpoints ────────────────────────────────────────────────────────────────
-// FIX: Use distinct proxy prefixes so Vite's rewrite doesn't break the path.
-// /nvidia-proxy  → strips to nothing  → https://integrate.api.nvidia.com/v1/chat/completions
-// /gemini-proxy  → strips to nothing  → https://generativelanguage.googleapis.com/v1beta/...
-const NVIDIA_URL = '/nvidia-proxy/v1/chat/completions';
-const GEMINI_URL = (key) =>
-  `/gemini-proxy/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
+// In DEV: Use Vite proxy. In PROD: Use Vercel serverless functions.
+const NVIDIA_URL = isDev ? '/nvidia-proxy/v1/chat/completions' : '/api/nvidia';
+const GEMINI_URL = isDev
+  ? `/gemini-proxy/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`
+  : '/api/gemini';
 
 // ─── Model ────────────────────────────────────────────────────────────────────
 // meta/llama-3.3-70b-instruct is confirmed working on the free NVIDIA NIM tier (2026).
@@ -58,7 +55,7 @@ async function callNvidia(prompt, history = []) {
     },
     {
       headers: {
-        Authorization: `Bearer ${NVIDIA_API_KEY}`,
+        ...(isDev && import.meta.env.VITE_NVIDIA_API_KEY ? { Authorization: `Bearer ${import.meta.env.VITE_NVIDIA_API_KEY}` } : {}),
         'Content-Type': 'application/json',
       },
       timeout: 35000,
@@ -84,7 +81,7 @@ async function callNvidia(prompt, history = []) {
 
 // ─── Gemini Provider ──────────────────────────────────────────────────────────
 async function callGemini(prompt, history = []) {
-  if (!GEMINI_API_KEY) throw new Error('Gemini API key not configured.');
+  if (isDev && !import.meta.env.VITE_GEMINI_API_KEY) throw new Error('Gemini API key not configured.');
 
   const contents = [
     { role: 'user', parts: [{ text: buildSystemPrompt() }] },
@@ -97,7 +94,7 @@ async function callGemini(prompt, history = []) {
   ];
 
   const res = await axios.post(
-    GEMINI_URL(GEMINI_API_KEY),
+    GEMINI_URL,
     { contents },
     {
       headers: { 'Content-Type': 'application/json' },
@@ -145,8 +142,9 @@ export async function generateAIContent(prompt, history = []) {
   const MAX_RETRIES = 2;
 
   const providers = [];
-  if (NVIDIA_API_KEY) providers.push({ name: 'NVIDIA', fn: callNvidia });
-  if (GEMINI_API_KEY) providers.push({ name: 'Gemini', fn: callGemini });
+  // In dev, add providers only if keys exist. In prod, always add them (keys are server-side).
+  if (!isDev || import.meta.env.VITE_NVIDIA_API_KEY) providers.push({ name: 'NVIDIA', fn: callNvidia });
+  if (!isDev || import.meta.env.VITE_GEMINI_API_KEY) providers.push({ name: 'Gemini', fn: callGemini });
 
   if (providers.length === 0) {
     return { error: 'No AI API key is configured. Please add VITE_NVIDIA_API_KEY or VITE_GEMINI_API_KEY to your .env file.' };

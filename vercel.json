@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/nvidia.js": {
+      "maxDuration": 40
+    },
+    "api/gemini.js": {
+      "maxDuration": 35
+    }
+  }
+}
