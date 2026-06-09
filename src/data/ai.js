@@ -1,104 +1,202 @@
 import axios from 'axios';
 import SYSTEM_PROMPT from './gemin.md?raw';
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_OPENROUTER_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+// ─── API Keys ────────────────────────────────────────────────────────────────
+const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY;
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
+// ─── Endpoints ────────────────────────────────────────────────────────────────
+// FIX: Use distinct proxy prefixes so Vite's rewrite doesn't break the path.
+// /nvidia-proxy  → strips to nothing  → https://integrate.api.nvidia.com/v1/chat/completions
+// /gemini-proxy  → strips to nothing  → https://generativelanguage.googleapis.com/v1beta/...
+const NVIDIA_URL = '/nvidia-proxy/v1/chat/completions';
+const GEMINI_URL = (key) =>
+  `/gemini-proxy/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
+
+// ─── Model ────────────────────────────────────────────────────────────────────
+// meta/llama-3.3-70b-instruct is confirmed working on the free NVIDIA NIM tier (2026).
+// Fallback options if this stops working: "meta/llama-3.1-405b-instruct", "nvidia/llama-3.3-nemotron-super-49b-v1"
+const NVIDIA_MODEL = 'meta/llama-3.3-70b-instruct';
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
+function buildSystemPrompt() {
+  return (
+    SYSTEM_PROMPT.trim() +
+    `\n\n---\n` +
+    `## Additional Behavior Rules\n` +
+    `- Always reply in the same language the user writes in.\n` +
+    `- Keep answers concise (2–5 sentences) unless the user asks for detail.\n` +
+    `- Never reveal that you are powered by NVIDIA or Google AI models.\n` +
+    `- If a question is outside Cryptware's scope, politely redirect to the team.\n` +
+    `- Format lists with bullet points. Use bold text sparingly for emphasis.\n` +
+    `- Do NOT fabricate prices, timelines, or team member names.\n`
+  );
+}
+
+// ─── NVIDIA Provider ──────────────────────────────────────────────────────────
+async function callNvidia(prompt, history = []) {
+  const messages = [
+    { role: 'system', content: buildSystemPrompt() },
+    ...history.map(({ role, content }) => ({
+      role: role === 'assistant' ? 'assistant' : 'user',
+      content,
+    })),
+    { role: 'user', content: prompt },
+  ];
+
+  const res = await axios.post(
+    NVIDIA_URL,
+    {
+      model: NVIDIA_MODEL,
+      messages,
+      max_tokens: 1024,
+      temperature: 0.6,
+      top_p: 0.95,
+      stream: false,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${NVIDIA_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      timeout: 35000,
+      validateStatus: () => true,
+    }
+  );
+
+  const { status, data } = res;
+
+  if (status === 401 || status === 403) throw new Error('NVIDIA key invalid or unauthorized.');
+  if (status === 429) throw new Error('NVIDIA rate limit hit.');
+  if (status === 503 || status === 502) throw new Error('NVIDIA service unavailable.');
+  if (status !== 200) {
+    const msg = data?.detail || data?.error?.message || `NVIDIA error ${status}`;
+    throw new Error(msg);
+  }
+
+  const text = data?.choices?.[0]?.message?.content?.trim();
+  if (!text) throw new Error('NVIDIA returned an empty response.');
+
+  return { text };
+}
+
+// ─── Gemini Provider ──────────────────────────────────────────────────────────
+async function callGemini(prompt, history = []) {
+  if (!GEMINI_API_KEY) throw new Error('Gemini API key not configured.');
+
+  const contents = [
+    { role: 'user', parts: [{ text: buildSystemPrompt() }] },
+    { role: 'model', parts: [{ text: 'Understood. I am ready to assist as the Cryptware Infotech AI assistant.' }] },
+    ...history.map(({ role, content }) => ({
+      role: role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: content }],
+    })),
+    { role: 'user', parts: [{ text: prompt }] },
+  ];
+
+  const res = await axios.post(
+    GEMINI_URL(GEMINI_API_KEY),
+    { contents },
+    {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 30000,
+      validateStatus: () => true,
+    }
+  );
+
+  const { status, data } = res;
+
+  if (status === 429) {
+    // FIX: 429 is transient (per-minute quota), not fatal — mark it retryable
+    throw new Error('Gemini rate limit hit.');
+  }
+  if (status === 401 || status === 403) throw new Error('Gemini key invalid or unauthorized.');
+  if (status === 400) {
+    const msg = data?.error?.message || 'Gemini bad request.';
+    throw new Error(`Gemini bad request — ${msg}`);
+  }
+  if (status === 503) throw new Error('Gemini service unavailable.');
+  if (status !== 200) {
+    const msg = data?.error?.message || `Gemini error ${status}`;
+    throw new Error(msg);
+  }
+
+  const finishReason = data?.candidates?.[0]?.finishReason;
+  if (finishReason === 'SAFETY') throw new Error('Gemini blocked the response for safety reasons.');
+
+  const parts = data?.candidates?.[0]?.content?.parts ?? [];
+  const text = parts
+    .filter((p) => typeof p.text === 'string')
+    .map((p) => p.text)
+    .join('')
+    .trim();
+
+  if (!text) throw new Error('Gemini returned an empty response.');
+
+  return { text };
+}
+
+// ─── Public API ───────────────────────────────────────────────────────────────
 export async function generateAIContent(prompt, history = []) {
-    if (!API_KEY) {
-        return { error: 'API key is missing. Set VITE_GEMINI_API_KEY in your .env file.' };
+  if (!prompt?.trim()) return { error: 'Please enter a message.' };
+
+  const MAX_RETRIES = 2;
+
+  const providers = [];
+  if (NVIDIA_API_KEY) providers.push({ name: 'NVIDIA', fn: callNvidia });
+  if (GEMINI_API_KEY) providers.push({ name: 'Gemini', fn: callGemini });
+
+  if (providers.length === 0) {
+    return { error: 'No AI API key is configured. Please add VITE_NVIDIA_API_KEY or VITE_GEMINI_API_KEY to your .env file.' };
+  }
+
+  let lastError = 'Unknown error.';
+
+  for (const { name, fn } of providers) {
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        console.info(`[AI] Trying ${name} (attempt ${attempt + 1}/${MAX_RETRIES + 1})`);
+        const result = await fn(prompt, history);
+        console.info(`[AI] ${name} responded successfully.`);
+        return result;
+      } catch (err) {
+        const msg = err?.message || 'Unknown error';
+        console.warn(`[AI] ${name} attempt ${attempt + 1} failed: ${msg}`);
+        lastError = msg;
+
+        // FIX: "rate limit hit." (from Gemini 429) is now correctly retryable
+        const isTransient =
+          msg.includes('unavailable') ||
+          msg.includes('rate limit') ||
+          msg.includes('empty response') ||
+          (axios.isAxiosError(err) &&
+            ['ECONNABORTED', 'ERR_NETWORK', 'ECONNRESET', 'ERR_FAILED'].includes(err.code));
+
+        if (!isTransient || attempt === MAX_RETRIES) break;
+
+        const backoff = 1500 * (attempt + 1); // slightly longer for quota resets
+        console.info(`[AI] Retrying ${name} in ${backoff}ms…`);
+        await sleep(backoff);
+      }
     }
 
-    // Build conversation contents with history support
-    const contents = [
-        // Inject system context as first user/model turn (Gemini doesn't have system role)
-        { role: 'user', parts: [{ text: SYSTEM_PROMPT }] },
-        { role: 'model', parts: [{ text: 'Understood. I am ready to assist Cryptware Infotech employees.' }] },
+    console.warn(`[AI] ${name} exhausted — falling back to next provider.`);
+  }
 
-        // Map previous history
-        ...history.map(({ role, content }) => ({
-            role: role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: content }],
-        })),
+  if (lastError.includes('quota') || lastError.includes('rate limit')) {
+    return { error: 'AI usage limit reached. Please try again in a moment or contact the Cryptware team directly.' };
+  }
+  if (lastError.includes('key') || lastError.includes('unauthorized')) {
+    return { error: 'AI configuration issue. Please contact the website administrator.' };
+  }
+  if (lastError.includes('timed out') || lastError.includes('ECONNABORTED')) {
+    return { error: 'The request timed out. Please check your connection and try again.' };
+  }
+  if (lastError.includes('network') || lastError.includes('ERR_NETWORK') || lastError.includes('ERR_FAILED')) {
+    return { error: 'Network error. Please check your internet connection.' };
+  }
 
-        // Current prompt
-        { role: 'user', parts: [{ text: prompt }] },
-    ];
-
-    const maxRetries = 2;
-
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        try {
-            const res = await axios.post(
-                GEMINI_URL,
-                {
-                    contents,
-                    tools: [{ googleSearch: {} }]
-                },
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    timeout: 30000,
-                    validateStatus: () => true, // handle all statuses manually
-                }
-            );
-
-            const status = res.status;
-            const isLast = attempt === maxRetries;
-
-            // Handle error statuses
-            if (status === 503) {
-                if (!isLast) {
-                    console.warn(`503 Busy. Retry ${attempt + 1}/${maxRetries}...`);
-                    await sleep(1500 * (attempt + 1)); // exponential-ish backoff
-                    continue;
-                }
-                return { error: 'AI service is currently busy. Please try again shortly.' };
-            }
-
-            if (status === 429) {
-                return { error: 'Daily request quota exceeded. Please try again tomorrow.' };
-            }
-
-            if (status === 400) {
-                return { error: 'Invalid request. Please rephrase your message.' };
-            }
-
-            if (status === 401 || status === 403) {
-                return { error: 'API key is invalid or unauthorized. Please check your configuration.' };
-            }
-
-            if (status !== 200) {
-                const errMsg = res.data?.error?.message || `Unexpected error (status ${status})`;
-                return { error: errMsg };
-            }
-
-            // Parse response
-            const text = res.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-            if (!text) {
-                // Check for safety blocks
-                const finishReason = res.data?.candidates?.[0]?.finishReason;
-                if (finishReason === 'SAFETY') {
-                    return { error: 'Response blocked due to safety filters. Please rephrase your message.' };
-                }
-                return { error: 'Empty response from AI. Please try again.' };
-            }
-
-            return { text };
-
-        } catch (err) {
-            if (attempt === maxRetries) {
-                if (axios.isAxiosError(err)) {
-                    if (err.code === 'ECONNABORTED') return { error: 'Request timed out. Please try again.' };
-                    if (err.code === 'ERR_NETWORK') return { error: 'Network error. Please check your connection.' };
-                }
-                return { error: err?.message || 'Something went wrong. Please try again later.' };
-            }
-            await sleep(1000);
-        }
-    }
-
-    return { error: 'Something went wrong. Please try again later.' };
+  return { error: 'Our AI assistant is temporarily unavailable. Please try again shortly or reach out at +91 7490971996.' };
 }
