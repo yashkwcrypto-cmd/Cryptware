@@ -71,6 +71,8 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
 
   const [activeSubcategory, setActiveSubcategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [hardwareVisibleCount, setHardwareVisibleCount] = useState(3);
+  const [hardwareFilterOpen, setHardwareFilterOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [expandedFeatureIndex, setExpandedFeatureIndex] = useState(null);
 
@@ -134,16 +136,24 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
   }, [cat, activeSubcategory, searchQuery, softwareTab]);
 
   const displayedItems = useMemo(() => {
+    if (cat === 'hardware') {
+      return filteredItems.slice(0, hardwareVisibleCount);
+    }
     if (cat === 'software' && !softwareExpanded && !searchQuery) {
       return filteredItems.slice(0, 3);
     }
     return filteredItems;
-  }, [filteredItems, cat, softwareExpanded, searchQuery]);
+  }, [filteredItems, cat, hardwareVisibleCount, softwareExpanded, searchQuery]);
 
   // Reset expanded state when tab changes
   useEffect(() => {
     setSoftwareExpanded(false);
   }, [softwareTab, cat]);
+
+  useEffect(() => {
+    setHardwareVisibleCount(3);
+    setHardwareFilterOpen(false);
+  }, [activeSubcategory, searchQuery, cat]);
 
   // GSAP animation for opening detail panel
   const handleOpenDetail = (item) => {
@@ -228,47 +238,139 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
 
         {/* HARDWARE FILTER BAR (Only visible for hardware) */}
         {cat === 'hardware' && (
-          <div className="flex flex-col md:flex-row gap-6 items-stretch md:items-center justify-between mb-12 border-b border-paper-3/30 pb-8">
-            {/* Subcategory Pills */}
-            <div className="flex gap-2 flex-wrap items-center overflow-x-auto py-1">
-              {subcategories.map(sub => (
-                <button
-                  key={sub}
-                  onClick={() => setActiveSubcategory(sub)}
-                  className={`text-[0.78rem] uppercase tracking-wider font-semibold px-4 py-2 rounded-lg border transition-all duration-200 ${activeSubcategory === sub
-                      ? 'bg-brand/10 border-brand text-brand'
-                      : 'bg-white border-paper-3/40 text-ink-3 hover:border-ink-3/50 hover:text-ink'
-                    }`}
+          <div className="mb-12 border-y border-paper-3/40 bg-white/70 backdrop-blur-sm">
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,300px)_1fr_auto] gap-4 items-center py-5">
+              <label className="relative block">
+                <span className="sr-only">Hardware category</span>
+                <select
+                  value={activeSubcategory}
+                  onChange={(e) => setActiveSubcategory(e.target.value)}
+                  className="w-full appearance-none bg-white border border-paper-3 rounded-lg px-4 py-3 pr-11 text-[0.82rem] font-bold uppercase text-ink shadow-sm outline-none transition-all duration-200 focus:border-brand focus:ring-2 focus:ring-brand/10"
                 >
-                  {sub === 'all' ? 'Show All' : (subcategoryNames[sub] || sub)}
+                  {subcategories.map(sub => (
+                    <option key={sub} value={sub}>
+                      {sub === 'all' ? 'All Hardware' : (subcategoryNames[sub] || sub)}
+                    </option>
+                  ))}
+                </select>
+                <svg className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </label>
+
+              <div className="relative">
+                <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                  <svg className="w-4 h-4 text-ink-3/60" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search hardware, labels, scanners..."
+                  className="w-full bg-white border border-paper-3 rounded-lg pl-11 pr-11 py-3 text-[0.9rem] text-ink placeholder:text-ink-3/45 shadow-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all duration-200"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-4 flex items-center text-ink-3/50 hover:text-ink"
+                    aria-label="Clear hardware search"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setHardwareFilterOpen(open => !open)}
+                  className="w-full lg:w-auto inline-flex h-[46px] items-center justify-center gap-2 rounded-lg border border-paper-3 bg-ink px-5 text-[0.78rem] font-bold uppercase text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(11,11,15,0.14)]"
+                  aria-expanded={hardwareFilterOpen}
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5h18M7 12h10M10 19h4" />
+                  </svg>
+                  Filter Menu
                 </button>
-              ))}
+
+                {hardwareFilterOpen && (
+                  <div className="absolute right-0 top-[calc(100%+0.75rem)] z-30 w-full min-w-[290px] rounded-xl border border-paper-3 bg-white p-4 shadow-[0_24px_70px_rgba(11,11,15,0.14)]">
+                    <div className="flex items-start justify-between gap-4 border-b border-paper-3/60 pb-3">
+                      <div>
+                        <p className="text-[0.72rem] font-bold uppercase text-ink">Hardware view</p>
+                        <p className="mt-1 text-[0.78rem] text-ink-3">{filteredItems.length} matching items</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveSubcategory('all');
+                          setSearchQuery('');
+                          setHardwareVisibleCount(3);
+                        }}
+                        className="text-[0.7rem] font-bold uppercase text-brand hover:text-brand-h"
+                      >
+                        Reset
+                      </button>
+                    </div>
+
+                    <div className="pt-4">
+                      <p className="mb-3 text-[0.72rem] font-bold uppercase text-ink-3">Show at once</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[3, 6, 9].map(count => (
+                          <button
+                            key={count}
+                            type="button"
+                            onClick={() => setHardwareVisibleCount(count)}
+                            className={`h-10 rounded-lg border text-[0.82rem] font-bold transition-all duration-200 ${hardwareVisibleCount === count
+                                ? 'border-brand bg-brand text-white shadow-sm'
+                                : 'border-paper-3 bg-paper-2 text-ink hover:border-brand/40 hover:text-brand'
+                              }`}
+                          >
+                            {count}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 rounded-lg bg-paper-2 px-3 py-3 text-[0.78rem] text-ink-3">
+                      Showing <span className="font-bold text-ink">{Math.min(displayedItems.length, filteredItems.length)}</span> of <span className="font-bold text-ink">{filteredItems.length}</span> hardware results.
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Search Input */}
-            <div className="relative min-w-[260px] md:min-w-[320px]">
-              <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <svg className="w-4 h-4 text-ink-3/60" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search hardware..."
-                className="w-full bg-white border border-paper-3 rounded-full pl-11 pr-5 py-3 text-[0.875rem] text-ink placeholder:text-ink-3/40 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all duration-200"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-4 flex items-center text-ink-3/50 hover:text-ink"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
+            <div className="flex flex-col gap-3 border-t border-paper-3/30 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-lg bg-brand/10 px-3 py-1.5 text-[0.7rem] font-bold uppercase text-brand">
+                  {activeSubcategory === 'all' ? 'All Hardware' : (subcategoryNames[activeSubcategory] || activeSubcategory)}
+                </span>
+                {searchQuery && (
+                  <span className="rounded-lg bg-ink/5 px-3 py-1.5 text-[0.7rem] font-bold uppercase text-ink-3">
+                    Search: {searchQuery}
+                  </span>
+                )}
+              </div>
+
+              <div className="inline-flex w-full rounded-lg border border-paper-3 bg-white p-1 shadow-sm sm:w-auto">
+                {[3, 6, 9].map(count => (
+                  <button
+                    key={count}
+                    type="button"
+                    onClick={() => setHardwareVisibleCount(count)}
+                    className={`flex-1 rounded-md px-4 py-2 text-[0.78rem] font-bold uppercase transition-all duration-200 sm:flex-none ${hardwareVisibleCount === count
+                        ? 'bg-ink text-white'
+                        : 'text-ink-3 hover:bg-paper-2 hover:text-ink'
+                      }`}
+                  >
+                    {count}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -310,7 +412,7 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedItems.map(item => (
+            {displayedItems.map((item, index) => (
               <div
                 key={item.id}
                 onClick={() => handleOpenDetail(item)}
@@ -319,12 +421,13 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
                 {cat === 'hardware' ? (
                   <>
                     {/* Image Wrap */}
-                    <div className="aspect-[4/3] bg-paper-2 relative overflow-hidden border-b border-paper-3/20 flex items-center justify-center p-6">
+                    <div className="aspect-[4/3] bg-[linear-gradient(135deg,#f8fafc_0%,#ffffff_55%,#edf7fb_100%)] relative overflow-hidden border-b border-paper-3/20 flex items-center justify-center p-6">
+                      <div className="absolute inset-x-6 top-6 h-px bg-gradient-to-r from-transparent via-brand/30 to-transparent" />
                       {item.img ? (
                         <img
                           src={item.img}
                           alt={item.title}
-                          className="max-h-full max-w-full object-contain filter group-hover:scale-[1.05] transition-transform duration-500 ease-ease"
+                          className="max-h-full max-w-full object-contain drop-shadow-sm group-hover:scale-[1.05] transition-transform duration-500 ease-ease"
                           onError={(e) => {
                             // Fallback logo if image fails to load
                             e.target.src = '/assets/img/logo.jpg';
@@ -338,9 +441,15 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
                         </div>
                       )}
                       {/* Category badge */}
-                      <span className="absolute top-4 left-4 bg-ink/5 border border-ink/10 text-ink text-[0.65rem] tracking-wider uppercase font-bold px-2.5 py-1 rounded">
-                        {subcategoryNames[item.subcategory] || item.subcategory}
-                      </span>
+                      <div className="absolute left-4 top-4 flex max-w-[calc(100%-2rem)] flex-wrap items-center gap-2">
+                        <span className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-brand/20 bg-white/90 px-2.5 py-1.5 text-[0.65rem] font-bold uppercase text-brand shadow-sm backdrop-blur-sm">
+                          <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+                          <span className="truncate">{subcategoryNames[item.subcategory] || item.subcategory}</span>
+                        </span>
+                        <span className="rounded-lg border border-ink/10 bg-white/80 px-2 py-1 text-[0.62rem] font-bold uppercase text-ink-3 shadow-sm backdrop-blur-sm">
+                          #{String(index + 1).padStart(2, '0')}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Content */}
@@ -354,11 +463,17 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-1.5 text-brand text-[0.8rem] font-bold tracking-wider uppercase mt-6 group-hover:gap-2.5 transition-all">
-                        View Details
-                        <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                        </svg>
+                      <div className="mt-6 flex items-center justify-between gap-4 border-t border-paper-3/40 pt-5">
+                        <span className="inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase text-ink-3">
+                          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                          Ready to quote
+                        </span>
+                        <span className="flex items-center gap-1.5 text-brand text-[0.78rem] font-bold uppercase group-hover:gap-2.5 transition-all">
+                          Details
+                          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                          </svg>
+                        </span>
                       </div>
                     </div>
                   </>

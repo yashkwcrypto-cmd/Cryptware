@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <footer className="bg-ink text-white py-16 border-t border-white/5 rounded-t-[42px]">
+    <footer className="bg-ink text-white py-16 border-t border-white/5 rounded-t-[42px] mt-[10px]">
       <div className="w-[92%] max-w-[1280px] mx-auto">
         {/* FOOTER NAV BAR */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12 pt-4 pb-8 border-b border-white/5">
