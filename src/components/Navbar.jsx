@@ -49,7 +49,7 @@ export default function Navbar({ onMenuToggle, isMenuOpen, onNavCatalog }) {
     <nav
       className="fixed top-0 left-0 w-full h-[72px] z-50 bg-white/85 backdrop-blur-[22px] saturate-[180%] border-b border-black/[0.04] shadow-[0_1px_0_rgba(0,0,0,0.06)] opacity-100 translate-y-0"
     >
-      <div className="w-[92%] max-w-[1280px] mx-auto h-full flex items-center justify-between relative">
+      <div className="w-full px-6 md:px-[200px] lg:px-[200px] xl:px-[200px] h-full flex items-center justify-between relative">
         {/* LOGO - Left */}
         <a
           href="#"

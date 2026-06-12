@@ -14,7 +14,7 @@ const TECH_DATA = [
   { text: "JS", color: "#F7DF1E", logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" },
   { text: "Angular", color: "#DD0031", logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/angular/angular-original.svg" },
   { text: ".NET", color: "#512BD4", logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/dot-net/dot-net-original.svg" },
-  { text: "PHP", color: "#777BB4", logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/php/php-original.svg" },
+  { text: "Java", color: "#e4e4ebff", logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" },
   { text: "Azure", color: "#0089D6", logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/azure/azure-original.svg" },
   { text: "Flutter", color: "#02569B", logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/flutter/flutter-original.svg" },
   { text: "Kotlin", color: "#7F52FF", logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kotlin/kotlin-original.svg" },
@@ -31,11 +31,11 @@ const PremiumObject = () => {
     if (meshRef.current) {
       const baseRotationX = time * 0.1;
       const baseRotationY = time * 0.15;
-      
+
       // Cursor interaction
       const targetRotationX = (state.pointer.y * Math.PI) / 4;
       const targetRotationY = (state.pointer.x * Math.PI) / 4;
-      
+
       meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, baseRotationX - targetRotationX, 0.05);
       meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, baseRotationY + targetRotationY, 0.05);
     }
@@ -45,12 +45,12 @@ const PremiumObject = () => {
     <Float speed={2} rotationIntensity={1} floatIntensity={1.5} floatingRange={[-0.1, 0.1]}>
       <mesh ref={meshRef} castShadow receiveShadow>
         <icosahedronGeometry args={[1.2, 0]} />
-        <meshPhysicalMaterial 
-          color="#06A3DA" 
-          emissive="#06A3DA" 
-          emissiveIntensity={0.3} 
-          roughness={0.05} 
-          metalness={0.9} 
+        <meshPhysicalMaterial
+          color="#06A3DA"
+          emissive="#06A3DA"
+          emissiveIntensity={0.3}
+          roughness={0.05}
+          metalness={0.9}
           clearcoat={1.0}
           clearcoatRoughness={0.1}
         />
@@ -93,9 +93,9 @@ const TechBlock = ({ position, text, color, logoUrl }) => {
       <group position={position}>
         <mesh ref={meshRef} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut} castShadow>
           <RoundedBox args={[0.35, 0.35, 0.35]} radius={0.06} smoothness={4}>
-            <meshStandardMaterial 
-              color={hovered ? "#ffffff" : color} 
-              roughness={0.2} 
+            <meshStandardMaterial
+              color={hovered ? "#ffffff" : color}
+              roughness={0.2}
               metalness={0.8}
               emissive={hovered ? color : "#000000"}
               emissiveIntensity={hovered ? 0.8 : 0.2}
@@ -130,7 +130,7 @@ const ResponsiveScene = () => {
     return TECH_DATA.map((tech, i) => {
       const angle = (i / TECH_DATA.length) * Math.PI * 2;
       // Create a wavy orbit so they aren't all on one flat plane
-      const y = Math.sin(angle * 4) * 1.5; 
+      const y = Math.sin(angle * 4) * 1.5;
       return {
         ...tech,
         pos: [
@@ -146,7 +146,7 @@ const ResponsiveScene = () => {
     if (groupRef.current) {
       // Gently rotate the entire orbital galaxy over time
       groupRef.current.rotation.y = state.clock.elapsedTime * 0.05;
-      
+
       // Slight parallax tilt based on cursor
       const targetTiltX = (state.pointer.y * Math.PI) / 8;
       const targetTiltY = (state.pointer.x * Math.PI) / 8;
@@ -180,7 +180,7 @@ export default function Hero3D() {
         <directionalLight position={[10, 10, 5]} intensity={2} color="#ffffff" castShadow />
         <directionalLight position={[-10, -10, -5]} intensity={1} color="#06A3DA" />
         <Sparkles count={30} scale={14} size={1.5} speed={0.3} opacity={0.25} color="#06A3DA" />
-        
+
         <ResponsiveScene />
       </Canvas>
     </div>

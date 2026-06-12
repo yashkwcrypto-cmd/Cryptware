@@ -110,7 +110,17 @@ export default function App() {
           }}
         />
         {/* 7. TechStack - Frontend/Backend/Mobile/UX tech breakdown */}
-        {!isHardwareRoute && <TechStack />}
+        {!isHardwareRoute && (
+          <TechStack
+            onQuoteRequest={(msg) => {
+              setInquiryMessage(msg);
+              const target = document.querySelector('#contact-us');
+              if (target) {
+                gsap.to(window, { duration: 1.2, scrollTo: { y: target, offsetY: 72 }, ease: 'power3.inOut' });
+              }
+            }}
+          />
+        )}
         {/* 8. TechLogos - Infinite scrolling tech logo strip */}
         {!isHardwareRoute && <TechLogos />}
         {/* 9. Benefits / What We Provide - 6 items */}

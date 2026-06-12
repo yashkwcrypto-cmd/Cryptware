@@ -9,11 +9,12 @@ const logos = [
   { src: '/assets/img/languageLogo/azure.png', alt: 'Azure' },
   { src: '/assets/img/languageLogo/mongodb.png', alt: 'MongoDB' },
   { src: '/assets/img/languageLogo/Javascript.png', alt: 'JavaScript' },
+  { src: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg', alt: 'Java' },
+  { src: 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg', alt: 'Nextjs', customClass: 'h-6' },
   { src: '/assets/img/languageLogo/Android.png', alt: 'Android' },
   { src: '/assets/img/languageLogo/IOS.png', alt: 'iOS' },
   { src: '/assets/img/languageLogo/Kotlin.png', alt: 'Kotlin' },
   { src: '/assets/img/languageLogo/Figma.png', alt: 'Figma' },
-  { src: '/assets/img/languageLogo/php.png', alt: 'PHP' },
   { src: '/assets/img/languageLogo/sql.png', alt: 'SQL' },
   { src: '/assets/img/languageLogo/css.png', alt: 'CSS' },
   { src: '/assets/img/languageLogo/html.png', alt: 'HTML' },
@@ -44,7 +45,7 @@ export default function TechLogos() {
               alt={logo.alt}
               loading="lazy"
               decoding="async"
-              className="h-12 object-contain"
+              className={`${logo.customClass || 'h-12'} object-contain transition-all duration-300`}
               onError={(e) => {
                 e.target.style.display = 'none';
               }}
