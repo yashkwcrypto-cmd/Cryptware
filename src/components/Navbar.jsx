@@ -58,7 +58,7 @@ export default function Navbar({ onMenuToggle, isMenuOpen, onNavCatalog }) {
         >
           <img
             src="/assets/img/logo-removebg-preview.png"
-            alt="Cryptware Infotech Logo"
+            alt="Cryptware Infotech Solutions LLP Logo"
             className="h-[44px] md:h-[50px] w-auto object-contain"
           />
         </a>

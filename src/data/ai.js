@@ -90,7 +90,7 @@ async function callGemini(prompt, history = []) {
 
   const contents = [
     { role: 'user', parts: [{ text: buildSystemPrompt() }] },
-    { role: 'model', parts: [{ text: 'Understood. I am ready to assist as the Cryptware Infotech AI assistant.' }] },
+    { role: 'model', parts: [{ text: 'Understood. I am ready to assist as the Cryptware Infotech Solutions LLP AI assistant.' }] },
     ...history.map(({ role, content }) => ({
       role: role === 'assistant' ? 'model' : 'user',
       parts: [{ text: content }],

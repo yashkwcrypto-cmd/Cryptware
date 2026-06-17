@@ -43,7 +43,7 @@ function getBrand(item) {
       return brand;
     }
   }
-  return 'Cryptware'; // default brand for all Cryptware Infotech products
+  return 'Cryptware'; // default brand for all Cryptware Infotech Solutions LLP products
 }
 
 const FeatureIcon = ({ name, className = "" }) => {

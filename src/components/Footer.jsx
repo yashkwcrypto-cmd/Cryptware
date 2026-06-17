@@ -9,7 +9,7 @@ export default function Footer() {
           <a href="#" className="inline-block">
             <img
               src="/assets/img/logo-removebg-preview.png"
-              alt="Cryptware Infotech Logo"
+              alt="Cryptware Infotech Solutions LLP Logo"
               className="h-[50px] md:h-[60px] w-auto object-contain"
             />
           </a>
@@ -106,7 +106,7 @@ export default function Footer() {
 
         {/* BOTTOM LAYER */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-white/5 text-[0.825rem] text-white/30">
-          <p>© {new Date().getFullYear()} Cryptware Infotech. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Cryptware Infotech Solutions LLP. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-white transition-colors">Privacy</a>
             <a href="#" className="hover:text-white transition-colors">Terms</a>

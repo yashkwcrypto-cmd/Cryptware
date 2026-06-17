@@ -723,7 +723,7 @@ export const catalogData = [
   },
   {
     "id": "e-commerce-erp-template",
-    "title": "ERP - Cryptware Infotech",
+    "title": "ERP - Cryptware Infotech Solutions LLP",
     "category": "industries",
     "subcategory": "templates",
     "description": "This premium ERP product helps businesses run their daily operations in one place. It supports two working styles: Warehouse and inventory operations (WMS), and Billing and invoice operations (Billing). It is built for teams who want better control over purchasing, stock movement, sales fulfillment, invoicing, profit tracking, and team accountability. In simple words, this system helps a business buy better, sell faster, track stock clearly, and make better decisions with real numbers.",

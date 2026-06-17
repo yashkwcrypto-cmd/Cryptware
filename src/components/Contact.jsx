@@ -52,7 +52,7 @@ function SendMessageModal({ onClose }) {
               </svg>
             </div>
             <div>
-              <p className="text-[0.7rem] tracking-widest uppercase text-brand font-bold leading-none mb-0.5">Cryptware Infotech</p>
+              <p className="text-[0.7rem] tracking-widest uppercase text-brand font-bold leading-none mb-0.5">Cryptware Infotech Solutions LLP</p>
               <h3 className="font-serif text-[1.15rem] text-ink font-normal leading-tight">Send us a Message</h3>
             </div>
           </div>
@@ -279,7 +279,7 @@ export default function Contact({ initialMessage }) {
               <div className="rounded-2xl overflow-hidden border border-white/[0.08] h-[220px] relative mt-1">
                 <div className="absolute inset-0 ring-1 ring-inset ring-white/[0.05] rounded-2xl z-10 pointer-events-none" />
                 <iframe
-                  title="Cryptware Infotech Location"
+                  title="Cryptware Infotech Solutions LLP Location"
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3671.9065889478!2d72.51957315!3d23.02838958!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e858c6620f8d9%3A0x66940b9e69da7d1e!2sTitanium%20City%20Centre%2C%20Prahlad%20Nagar%2C%20Ahmedabad%2C%20Gujarat%20380015!5e0!3m2!1sen!2sin!4v1749384000000!5m2!1sen!2sin"
                   className="w-full h-full border-0 grayscale opacity-75"
                   loading="lazy"
