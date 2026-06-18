@@ -314,9 +314,9 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
           </span>
           <h2 className="font-serif text-[clamp(2.2rem,3.8vw,3.4rem)] leading-[1.12] text-ink font-normal">
             {cat === 'hardware' ? (
-              <>Discover our premium hardware <br /><em className="text-ink-3 not-italic">equipment &amp; accessories</em></>
+              <>Discover our premium hardware <br /><em className="text-ink not-italic">equipment &amp; accessories</em></>
             ) : (
-              <>Explore our enterprise software <br /><em className="text-ink-3 not-italic">&amp; business templates</em></>
+              <>Explore our enterprise software <br /><em className="text-ink not-italic">&amp; business templates</em></>
             )}
           </h2>
         </div>

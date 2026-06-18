@@ -520,7 +520,7 @@ export default function TechStack({ onQuoteRequest }) {
             Our tech stack
           </span>
           <h2 className="tech-title tech-fade-up font-serif text-[clamp(2.2rem,3.8vw,3.4rem)] leading-[1.12] text-ink font-normal">
-            Built with the best <em className="text-ink-3 not-italic">tools available</em>
+            Built with the best <em className="text-ink not-italic">tools available</em>
           </h2>
         </div>
 

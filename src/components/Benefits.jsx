@@ -129,7 +129,7 @@ export default function Benefits() {
             What we provide
           </span>
           <h2 className="prov-title prov-fade-up font-serif text-[clamp(2.2rem,3.8vw,3.4rem)] leading-[1.12] text-ink font-normal">
-            Benefits of <em className="text-ink-3 not-italic">hiring Cryptware</em>
+            Benefits of <em className="text-ink not-italic">hiring Cryptware</em>
           </h2>
         </div>
 

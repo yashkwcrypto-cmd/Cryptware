@@ -164,7 +164,7 @@ export default function Beliefs() {
               What we believe
             </span>
             <h2 className="beliefs-fade-up font-serif text-[clamp(2.2rem,4.2vw,3.6rem)] leading-[1.12] text-ink font-normal text-center">
-              Principles that <em className="text-ink-3 not-italic">guide every decision</em>
+              Principles that <em className="text-ink not-italic">guide every decision</em>
             </h2>
           </div>
 

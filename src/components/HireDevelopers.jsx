@@ -148,7 +148,7 @@ export default function HireDevelopers() {
           </span>
           <h2 className="hire-fade-up font-serif text-[clamp(2.4rem,4vw,3.6rem)] leading-[1.1] font-normal mb-6">
             Build your team with<br />
-            <em className="text-white/40 not-italic">world-class talent</em>
+            <em className="text-white not-italic">world-class talent</em>
           </h2>
           <p className="hire-fade-up text-white/55 text-[1rem] leading-[1.8] max-w-[560px]">
             Hire dedicated developers who work exclusively on your project — following your timezone, your workflow, and your vision. From startup MVPs to enterprise platforms, we have the expertise you need.

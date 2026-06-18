@@ -126,7 +126,7 @@ export default function Stats() {
         <div className="text-center mb-14">
           <span className="stats-heading block text-brand tracking-[0.16em] uppercase text-[0.72rem] font-semibold mb-4">By the numbers</span>
           <h2 className="stats-heading font-serif text-[clamp(2rem,3.5vw,3rem)] text-white font-normal leading-tight">
-            Trusted by businesses <em className="text-white/40 not-italic">worldwide</em>
+            Trusted by businesses <em className="text-white not-italic">worldwide</em>
           </h2>
         </div>
 

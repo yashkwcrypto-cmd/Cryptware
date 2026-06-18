@@ -197,7 +197,7 @@ export default function WhyChooseUs() {
             </span>
             <h2 className="why-fade-up font-serif text-[clamp(2.2rem,3.8vw,3.4rem)] leading-[1.12] mb-6 font-normal">
               Thinkers, makers<br />
-              <em className="text-white/40 not-italic">and partners</em>
+              <em className="text-white not-italic">and partners</em>
             </h2>
             <p className="why-fade-up text-white/60 leading-[1.75] mb-4 text-[0.95rem]">
               We closely work with your team to build an MVP that solves primary problems. Leveraging rich Scrum &amp; Lean experience, we follow Agile to deliver with the highest performance.

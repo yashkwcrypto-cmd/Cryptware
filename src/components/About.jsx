@@ -150,7 +150,7 @@ export default function About() {
               Who we are
             </span>
             <h2 className="about-title about-fade-up font-serif text-[clamp(2.2rem,3.8vw,3.4rem)] leading-[1.12] text-ink font-normal">
-              We care about <em className="text-ink-3 not-italic">your success</em>
+              We care about <em className="text-ink not-italic">your success</em>
             </h2>
             <p className="about-fade-up text-ink-3 text-[0.95rem] leading-[1.75]">
               We are a team of extremely talented web and mobile app developers who love what they do and truly believe in creating long-term partnerships with our clients.

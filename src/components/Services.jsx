@@ -194,7 +194,7 @@ export default function Services() {
             </span>
             <h2 className="services-title font-serif text-[clamp(2.2rem,3.8vw,3.4rem)] leading-[1.12] text-ink font-normal">
               Custom IT solutions for<br />
-              <em className="text-ink-3 not-italic">your successful business</em>
+              <em className="text-ink not-italic">your successful business</em>
             </h2>
           </div>
           <div className="md:col-span-4 md:text-right">
