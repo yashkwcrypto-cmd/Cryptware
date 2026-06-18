@@ -129,7 +129,7 @@ export default function Stats() {
             Trusted by businesses <em className="text-white not-italic">worldwide</em>
           </h2>
         </div>
-
+{/*  */}
         <div className="stats-grid grid grid-cols-2 lg:grid-cols-4 gap-5">
           {stats.map((s, i) => (
             <StatCard key={i} {...s} triggered={triggered} />
