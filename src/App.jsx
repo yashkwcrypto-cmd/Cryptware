@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import CustomCursor from './components/CustomCursor';
 import Navbar from './components/Navbar';
 import MobileMenu from './components/MobileMenu';
@@ -19,59 +20,40 @@ import Catalog from './components/Catalog';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import FloatingChat from './components/FloatingChat';
+import HardwareCatalogPage from './pages/HardwareCatalogPage';
+import HardwareProductPage from './pages/HardwareProductPage';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 
 gsap.registerPlugin(ScrollToPlugin);
 
-export default function App() {
+// ─── Main Home Page ────────────────────────────────────────────────────────────
+function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [catalogCategory, setCatalogCategory] = useState('hardware');
   const [inquiryMessage, setInquiryMessage] = useState('');
-  const [currentHash, setCurrentHash] = useState(window.location.hash);
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
-
-  useEffect(() => {
-    const handleLocationChange = () => {
-      setCurrentHash(window.location.hash);
-      setCurrentPath(window.location.pathname);
-    };
-    window.addEventListener('hashchange', handleLocationChange);
-    window.addEventListener('popstate', handleLocationChange);
-    return () => {
-      window.removeEventListener('hashchange', handleLocationChange);
-      window.removeEventListener('popstate', handleLocationChange);
-    };
-  }, []);
 
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
+    return () => { document.body.style.overflow = 'auto'; };
   }, [isMenuOpen]);
 
-  const isHardwareRoute = currentHash.toLowerCase().includes('hardware') ||
-    currentPath.toLowerCase().includes('hardware');
-
   const handleNavCatalog = (category) => {
-    setCatalogCategory(category);
     const target = document.querySelector('#catalog');
     if (target) {
-      gsap.to(window, {
-        duration: 1.2,
-        scrollTo: { y: target, offsetY: 72 },
-        ease: 'power3.inOut'
-      });
+      gsap.to(window, { duration: 1.2, scrollTo: { y: target, offsetY: 72 }, ease: 'power3.inOut' });
+    }
+  };
+
+  const scrollToContact = () => {
+    const target = document.querySelector('#contact-us');
+    if (target) {
+      gsap.to(window, { duration: 1.2, scrollTo: { y: target, offsetY: 72 }, ease: 'power3.inOut' });
     }
   };
 
   return (
     <div className="relative min-h-screen bg-paper font-sans text-ink selection:bg-brand selection:text-white">
-      {/* Dynamic Interactivity Layer */}
       <CustomCursor />
-
-      {/* Navigation Layer */}
       <Navbar
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
         isMenuOpen={isMenuOpen}
@@ -82,62 +64,43 @@ export default function App() {
         onClose={() => setIsMenuOpen(false)}
         onNavCatalog={handleNavCatalog}
       />
-
-      {/* Section Layers */}
       <main>
-        {/* 1. Hero - Full-screen landing */}
-        <Hero isHardwareRoute={isHardwareRoute} />
-        {/* 2. Marquee - Scrolling text strip */}
-        <Marquee />
-        {/* 3. Stats - Animated counters */}
+        <Hero isHardwareRoute={false} />
+        <Marquee hardware={false} />
         <Stats />
-        {/* 4. About - Who we are */}
         <About />
         <Beliefs />
-        {/* 5. Services - 4 service cards (Web, Mobile, UX, Digital Marketing) */}
         <Services />
-        {/* 6. WhyChooseUs - 3D card section */}
         <WhyChooseUs />
-        {/* 8b. Catalog - NEW Product/Solutions catalog */}
         <Catalog
-          activeCategory={isHardwareRoute ? 'hardware' : 'software'}
-          onQuoteRequest={(msg) => {
-            setInquiryMessage(msg);
-            const target = document.querySelector('#contact-us');
-            if (target) {
-              gsap.to(window, { duration: 1.2, scrollTo: { y: target, offsetY: 72 }, ease: 'power3.inOut' });
-            }
-          }}
+          activeCategory="software"
+          onQuoteRequest={(msg) => { setInquiryMessage(msg); scrollToContact(); }}
         />
-        {/* 7. TechStack - Frontend/Backend/Mobile/UX tech breakdown */}
-        {!isHardwareRoute && (
-          <TechStack
-            onQuoteRequest={(msg) => {
-              setInquiryMessage(msg);
-              const target = document.querySelector('#contact-us');
-              if (target) {
-                gsap.to(window, { duration: 1.2, scrollTo: { y: target, offsetY: 72 }, ease: 'power3.inOut' });
-              }
-            }}
-          />
-        )}
-        {/* 8. TechLogos - Infinite scrolling tech logo strip */}
-        {!isHardwareRoute && <TechLogos />}
-        {/* 9. Benefits / What We Provide - 6 items */}
+        <TechStack
+          onQuoteRequest={(msg) => { setInquiryMessage(msg); scrollToContact(); }}
+        />
+        <TechLogos />
         <Benefits />
-        {/* 10. Hire Developers - Dark section with roles & engagement models */}
-        {!isHardwareRoute && <HireDevelopers />}
-        {/* 13. Pricing - Crypto Accounting Silver/Gold plans */}
-        {!isHardwareRoute && <Pricing />}
-        {/* 14. Contact - Form + Map + CTA merged */}
+        <HireDevelopers />
+        <Pricing />
         <Contact initialMessage={inquiryMessage} />
-        {/* 11. Testimonials - Client reviews */}
         <Testimonials />
       </main>
-
-      {/* Footer Layer */}
       <Footer />
       <FloatingChat />
     </div>
+  );
+}
+
+// ─── App Router ────────────────────────────────────────────────────────────────
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/hardware" element={<HardwareCatalogPage />} />
+      <Route path="/hardware/product" element={<HardwareProductPage />} />
+      {/* fallback */}
+      <Route path="*" element={<HomePage />} />
+    </Routes>
   );
 }

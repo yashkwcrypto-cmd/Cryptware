@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 
@@ -63,8 +64,8 @@ export default function MobileMenu({ isOpen, onClose, onNavCatalog }) {
 
 
           <a href="#services" onClick={(e) => handleLinkClick(e, '#services')} className="hover:text-brand transition-colors text-ink">Services</a>
+          <Link to="/hardware" onClick={onClose} className="hover:text-brand transition-colors text-ink">Hardware</Link>
           <a href="#why" onClick={(e) => handleLinkClick(e, '#why')} className="hover:text-brand transition-colors text-ink">Why Cryptware</a>
-          <a href="#hire" onClick={(e) => handleLinkClick(e, '#hire')} className="hover:text-brand transition-colors text-ink">Hire Developers</a>
           <a href="#about" onClick={(e) => handleLinkClick(e, '#about')} className="hover:text-brand transition-colors text-ink">About Us</a>
           <a href="#pricing" onClick={(e) => handleLinkClick(e, '#pricing')} className="hover:text-brand transition-colors text-ink">Pricing</a>
           <a href="#contact-us" onClick={(e) => handleLinkClick(e, '#contact-us')} className="text-brand font-medium hover:underline flex items-center gap-2 mt-4 font-sans text-lg uppercase tracking-wider">Let's Talk →</a>
