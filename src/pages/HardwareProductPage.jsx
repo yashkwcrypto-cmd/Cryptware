@@ -392,6 +392,7 @@ export default function HardwareProductPage() {
   };
 
   const hardwareItems = useMemo(() => catalogData.filter(i => i.type === 'hardware'), []);
+  const totalCount = hardwareItems.length;
 
   const availableBrands = useMemo(() => {
     const brandCount = {};
@@ -403,13 +404,20 @@ export default function HardwareProductPage() {
     return Object.entries(brandCount).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
   }, [hardwareItems, activeCategory]);
 
-  const filteredItems = useMemo(() => {
+const filteredItems = useMemo(() => {
     let items = hardwareItems.filter(item => {
       const matchesCat = activeCategory === 'all' || item.subcategory === activeCategory;
       const sq = searchQuery.toLowerCase();
       const matchesSearch = !sq || item.title.toLowerCase().includes(sq) || item.description.toLowerCase().includes(sq) || (item.brand || '').toLowerCase().includes(sq);
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(item.brand || 'Cryptware');
-      return matchesCat && matchesSearch && matchesBrand;
+      
+      const itemText = (item.title + ' ' + item.description + ' ' + (item.models || []).join(' ')).toLowerCase();
+      const matchesSubtype = selectedSubtypes.length === 0 || selectedSubtypes.some(s => itemText.includes(s.toLowerCase()));
+      
+      const categoryIndustries = hardwareCategories.find(c => c.id === item.subcategory)?.industries || [];
+      const matchesIndustry = selectedIndustries.length === 0 || selectedIndustries.some(ind => categoryIndustries.includes(ind));
+      
+      return matchesCat && matchesSearch && matchesBrand && matchesSubtype && matchesIndustry;
     });
 
     if (sortBy === 'alpha') items = [...items].sort((a, b) => a.title.localeCompare(b.title));
@@ -418,7 +426,7 @@ export default function HardwareProductPage() {
     else items = [...items].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
 
     return items;
-  }, [hardwareItems, activeCategory, searchQuery, selectedBrands, sortBy]);
+  }, [hardwareItems, activeCategory, searchQuery, selectedBrands, sortBy, selectedSubtypes, selectedIndustries]);
 
   const displayedItems = filteredItems.slice(0, visibleCount);
 
@@ -442,131 +450,142 @@ export default function HardwareProductPage() {
     setVisibleCount(12);
   };
 
-  const clearAll = () => { setSelectedBrands([]); setSelectedSubtypes([]); setSelectedIndustries([]); setSearchQuery(''); setActiveCategory('all'); setVisibleCount(12); };
+  const clearAll = () => {
+    setSelectedBrands([]);
+    setSelectedSubtypes([]);
+    setSelectedIndustries([]);
+    setSearchQuery('');
+    setActiveCategory('all');
+    setVisibleCount(12);
+  };
 
-  const totalCount = hardwareItems.length;
-  const catColor = activeCategory !== 'all' ? (categoryColors[activeCategory] || '#06a3da') : '#06a3da';
-  const activeSubtypeList = activeCategory !== 'all' ? (subcategoryFilters[activeCategory] || []) : [];
-  const totalActiveFilters = selectedBrands.length + selectedSubtypes.length + selectedIndustries.length + (activeCategory !== 'all' ? 1 : 0);
+  const totalActiveFilters =
+    (activeCategory !== 'all' ? 1 : 0) +
+    selectedBrands.length +
+    selectedSubtypes.length +
+    selectedIndustries.length +
+    (searchQuery ? 1 : 0);
 
-  // ── Sidebar JSX (shared for desktop + mobile) ──────────────────────────────
-  const SidebarContent = ({ onClose }) => (
-    <div className="space-y-3">
-      {/* Category filter */}
-      <SidebarSection title="Product Categories">
-        <div className="space-y-0.5">
-          {sidebarCategories.map(cat => {
-            const CatIcon = categoryIconMap[cat.id] || Icon.Package;
-            const isActive = activeCategory === cat.id;
-            const count = cat.id === 'all' ? hardwareItems.length : hardwareItems.filter(i => i.subcategory === cat.id).length;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => { handleCategoryChange(cat.id); onClose?.(); }}
-                className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${isActive ? 'text-white shadow-sm' : 'text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0b0f1e]'}`}
-                style={isActive ? { background: `linear-gradient(135deg, ${catColor}, ${catColor}cc)` } : {}}
-              >
-                <span className="flex items-center gap-2.5">
-                  <CatIcon c="w-4 h-4" />
-                  <span>{cat.label}</span>
-                </span>
-                <span className={`text-[0.62rem] px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-white/20 text-white' : 'bg-[#f1f5f9] text-[#94a3b8]'}`}>{count}</span>
-              </button>
-            );
-          })}
-        </div>
-      </SidebarSection>
+  const currentCategoryColor = categoryColors[activeCategory] || '#06a3da';
 
-      {/* Sub-type filter — only when a category is selected */}
-      {activeSubtypeList.length > 0 && (
-        <SidebarSection title={`${subcategoryNames[activeCategory] || 'Category'} Types`} defaultOpen={true}>
+  function SidebarContent({ onClose } = {}) {
+    return (
+      <div className="flex flex-col gap-3">
+        <SidebarSection title="Category">
           <div className="space-y-0.5">
-            {activeSubtypeList.map(s => {
-              const isChecked = selectedSubtypes.includes(s);
+            {sidebarCategories.map(cat => {
+              const isChecked = activeCategory === cat.id;
+              const color = categoryColors[cat.id] || '#06a3da';
               return (
-                <label key={s} onClick={() => toggleSubtype(s)} className="flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group">
+                <label
+                  key={cat.id}
+                  onClick={() => {
+                    handleCategoryChange(cat.id);
+                    if (onClose) onClose();
+                  }}
+                  className="flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group"
+                >
                   <div
                     className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${isChecked ? 'border-transparent' : 'border-gray-300 group-hover:border-gray-400'}`}
-                    style={isChecked ? { background: catColor, borderColor: catColor } : {}}
+                    style={isChecked ? { background: color, borderColor: color } : {}}
                   >
                     {isChecked && <Icon.Check c="w-2.5 h-2.5 text-white" />}
                   </div>
-                  <span className="text-xs font-semibold" style={isChecked ? { color: catColor } : { color: '#374151' }}>{s}</span>
+                  <span className="text-xs font-semibold" style={isChecked ? { color } : { color: '#374151' }}>{cat.label}</span>
                 </label>
               );
             })}
           </div>
-          {selectedSubtypes.length > 0 && (
-            <button onClick={() => setSelectedSubtypes([])} className="mt-2 text-[0.62rem] font-bold text-[#06a3da] hover:text-[#0591c4]">Clear types</button>
-          )}
         </SidebarSection>
-      )}
 
-      {/* Brand filter */}
-      <SidebarSection title="Filter by Brand">
-        <div className="space-y-0.5 max-h-[250px] overflow-y-auto pr-0.5">
-          {availableBrands.map(({ name, count }) => {
-            const isChecked = selectedBrands.includes(name);
-            const bc = brandColors[name] || '#64748b';
-            return (
-              <label key={name} onClick={() => toggleBrand(name)} className="flex items-center justify-between gap-2 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group">
-                <div className="flex items-center gap-2">
+        <SidebarSection title="Filter by Type">
+          <div className="space-y-0.5 max-h-[250px] overflow-y-auto pr-0.5">
+            {(activeCategory === 'all'
+              ? Array.from(new Set(Object.values(subcategoryFilters).flat()))
+              : (subcategoryFilters[activeCategory] || [])
+            ).map((s, idx) => {
+              const isChecked = selectedSubtypes.includes(s);
+              const color = categoryColors[activeCategory] || '#06a3da';
+              return (
+                <label
+                  key={`${s}-${idx}`}
+                  onClick={() => toggleSubtype(s)}
+                  className="flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group"
+                >
                   <div
                     className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${isChecked ? 'border-transparent' : 'border-gray-300 group-hover:border-gray-400'}`}
-                    style={isChecked ? { background: bc, borderColor: bc } : {}}
+                    style={isChecked ? { background: color, borderColor: color } : {}}
                   >
                     {isChecked && <Icon.Check c="w-2.5 h-2.5 text-white" />}
                   </div>
-                  <span className="text-xs font-semibold" style={isChecked ? { color: bc } : { color: '#374151' }}>{name}</span>
-                </div>
-                <span className="text-[0.6rem] text-[#94a3b8] font-bold bg-[#f1f5f9] px-1.5 py-0.5 rounded-full">{count}</span>
-              </label>
-            );
-          })}
-        </div>
-        {selectedBrands.length > 0 && (
-          <button onClick={() => setSelectedBrands([])} className="mt-2 text-[0.62rem] font-bold text-[#06a3da] hover:text-[#0591c4]">Clear brands</button>
-        )}
-      </SidebarSection>
-
-      {/* Industry filter */}
-      <SidebarSection title="Industry" defaultOpen={false}>
-        <div className="space-y-0.5">
-          {industryOptions.map(ind => {
-            const isChecked = selectedIndustries.includes(ind);
-            return (
-              <label key={ind} onClick={() => toggleIndustry(ind)} className="flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group">
-                <div
-                  className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${isChecked ? 'border-transparent' : 'border-gray-300 group-hover:border-gray-400'}`}
-                  style={isChecked ? { background: '#06a3da', borderColor: '#06a3da' } : {}}
-                >
-                  {isChecked && <Icon.Check c="w-2.5 h-2.5 text-white" />}
-                </div>
-                <span className={`text-xs font-semibold ${isChecked ? 'text-[#06a3da]' : 'text-[#374151]'}`}>{ind}</span>
-              </label>
-            );
-          })}
-        </div>
-        {selectedIndustries.length > 0 && (
-          <button onClick={() => setSelectedIndustries([])} className="mt-2 text-[0.62rem] font-bold text-[#06a3da] hover:text-[#0591c4]">Clear industries</button>
-        )}
-      </SidebarSection>
-
-      {/* CTA widget */}
-      <div className="bg-gradient-to-br from-[#06a3da] to-[#214177] rounded-2xl p-5 text-white">
-        <div className="flex items-start gap-2.5 mb-3">
-          <Icon.Shield c="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="font-bold text-sm mb-0.5">Need a Custom Quote?</p>
-            <p className="text-white/65 text-xs leading-relaxed">Contact our specialists for bulk pricing, demo units &amp; rollout support.</p>
+                  <span className="text-xs font-semibold" style={isChecked ? { color } : { color: '#374151' }}>{s}</span>
+                </label>
+              );
+            })}
           </div>
+        </SidebarSection>
+
+        <SidebarSection title="Filter by Brand">
+          <div className="space-y-0.5 max-h-[250px] overflow-y-auto pr-0.5">
+            {availableBrands.map(({ name, count }) => {
+              const isChecked = selectedBrands.includes(name);
+              const bc = brandColors[name] || '#64748b';
+              return (
+                <label key={name} onClick={() => toggleBrand(name)} className="flex items-center justify-between gap-2 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${isChecked ? 'border-transparent' : 'border-gray-300 group-hover:border-gray-400'}`}
+                      style={isChecked ? { background: bc, borderColor: bc } : {}}
+                    >
+                      {isChecked && <Icon.Check c="w-2.5 h-2.5 text-white" />}
+                    </div>
+                    <span className="text-xs font-semibold" style={isChecked ? { color: bc } : { color: '#374151' }}>{name}</span>
+                  </div>
+                  <span className="text-[0.6rem] text-[#94a3b8] font-bold bg-[#f1f5f9] px-1.5 py-0.5 rounded-full">{count}</span>
+                </label>
+              );
+            })}
+          </div>
+        </SidebarSection>
+
+        <SidebarSection title="Industry" defaultOpen={false}>
+          <div className="space-y-0.5">
+            {industryOptions.map(ind => {
+              const isChecked = selectedIndustries.includes(ind);
+              return (
+                <label key={ind} onClick={() => toggleIndustry(ind)} className="flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group">
+                  <div
+                    className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${isChecked ? 'border-transparent' : 'border-gray-300 group-hover:border-gray-400'}`}
+                    style={isChecked ? { background: '#06a3da', borderColor: '#06a3da' } : {}}
+                  >
+                    {isChecked && <Icon.Check c="w-2.5 h-2.5 text-white" />}
+                  </div>
+                  <span className={`text-xs font-semibold ${isChecked ? 'text-[#06a3da]' : 'text-[#374151]'}`}>{ind}</span>
+                </label>
+              );
+            })}
+          </div>
+        </SidebarSection>
+
+        <div className="bg-gradient-to-br from-[#06a3da] to-[#214177] rounded-2xl p-5 text-white">
+          <div className="flex items-start gap-2.5 mb-3">
+            <Icon.Shield c="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-bold text-sm mb-0.5">Need a Custom Quote?</p>
+              <p className="text-white/65 text-xs leading-relaxed">Contact our specialists for bulk pricing, demo units &amp; rollout support.</p>
+            </div>
+          </div>
+          <Link
+            to="/#contact-us"
+            onClick={() => onClose?.()}
+            className="block w-full py-2.5 bg-white/15 hover:bg-white/25 border border-white/20 rounded-xl text-center text-xs font-bold uppercase tracking-wider transition-all duration-200"
+          >
+            Get in Touch
+          </Link>
         </div>
-        <Link to="/#contact-us" className="block w-full py-2.5 bg-white/15 hover:bg-white/25 border border-white/20 rounded-xl text-center text-xs font-bold uppercase tracking-wider transition-all duration-200">
-          Get in Touch
-        </Link>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="relative min-h-screen bg-[#f8faff] font-sans text-[#1a1a2e] overflow-x-hidden">
@@ -696,7 +715,7 @@ export default function HardwareProductPage() {
                   </span>
                 ))}
                 {selectedSubtypes.map(s => (
-                  <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.68rem] font-bold uppercase tracking-wider border" style={{ background: `${catColor}10`, color: catColor, borderColor: `${catColor}20` }}>
+                  <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.68rem] font-bold uppercase tracking-wider border" style={{ background: `${currentCategoryColor}10`, color: currentCategoryColor, borderColor: `${currentCategoryColor}20` }}>
                     {s}<button onClick={() => toggleSubtype(s)}><Icon.Close c="w-3 h-3" /></button>
                   </span>
                 ))}
