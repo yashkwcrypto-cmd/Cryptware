@@ -1,6 +1,102 @@
 import React, { useState } from 'react';
 import { generateAIContent } from '../data/ai';
 
+function formatInline(text) {
+  const nodes = [];
+  const regex = /(\*\*[^*]+\*\*)|(https?:\/\/[^\s)]+)|(\[[^\]]+\]\([^)]+\))/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      nodes.push(text.slice(lastIndex, match.index));
+    }
+
+    const token = match[0];
+    if (token.startsWith('**') && token.endsWith('**')) {
+      nodes.push(<strong key={`${match.index}-bold`}>{token.slice(2, -2)}</strong>);
+    } else if (token.startsWith('[')) {
+      const label = token.slice(1, token.indexOf(']('));
+      const href = token.slice(token.indexOf('](') + 2, -1);
+      nodes.push(
+        <a
+          key={`${match.index}-mdlink`}
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          className="text-brand underline underline-offset-2 hover:text-brand-h break-all"
+        >
+          {label}
+        </a>
+      );
+    } else {
+      nodes.push(
+        <a
+          key={`${match.index}-url`}
+          href={token}
+          target="_blank"
+          rel="noreferrer"
+          className="text-brand underline underline-offset-2 hover:text-brand-h break-all"
+        >
+          {token}
+        </a>
+      );
+    }
+
+    lastIndex = match.index + token.length;
+  }
+
+  if (lastIndex < text.length) {
+    nodes.push(text.slice(lastIndex));
+  }
+
+  return nodes;
+}
+
+function renderMessage(text) {
+  const normalized = text.replace(/\r\n/g, '\n').replace(/â€¦/g, '...').replace(/â€”/g, '—');
+  const blocks = [];
+  let listItems = [];
+
+  const flushList = () => {
+    if (!listItems.length) return;
+    blocks.push(
+      <ul key={`ul-${blocks.length}`} className="pl-4 space-y-1.5 list-disc">
+        {listItems}
+      </ul>
+    );
+    listItems = [];
+  };
+
+  normalized.split('\n').forEach((rawLine, index) => {
+    const line = rawLine.trim();
+    if (!line) {
+      flushList();
+      return;
+    }
+
+    const bullet = line.match(/^[-*•]\s+(.*)$/);
+    if (bullet) {
+      listItems.push(
+        <li key={`li-${index}`} className="leading-relaxed">
+          {formatInline(bullet[1])}
+        </li>
+      );
+      return;
+    }
+
+    flushList();
+    blocks.push(
+      <p key={`p-${index}`} className="leading-relaxed">
+        {formatInline(line)}
+      </p>
+    );
+  });
+
+  flushList();
+  return <div className="space-y-2">{blocks}</div>;
+}
+
 export default function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -38,9 +134,7 @@ export default function FloatingChat() {
               <span className="text-[0.78rem] font-bold tracking-tight text-ink">Cryptware Assistant</span>
             </div>
             <div className="flex items-center gap-1">
-              <button
-                className="px-3 py-1.5 rounded-full text-[0.72rem] font-semibold bg-brand text-white transition-colors"
-              >
+              <button className="px-3 py-1.5 rounded-full text-[0.72rem] font-semibold bg-brand text-white transition-colors">
                 AI Chat
               </button>
               <button
@@ -62,10 +156,10 @@ export default function FloatingChat() {
                     : 'self-start bg-white text-ink border border-paper-3 rounded-bl-sm'
                 }`}
               >
-                {msg.text}
+                {msg.from === 'bot' ? renderMessage(msg.text) : msg.text}
               </div>
             ))}
-            {loading && <div className="self-start px-3.5 py-2.5 rounded-2xl bg-white border border-paper-3 text-ink-3 text-[0.82rem]">Thinking…</div>}
+            {loading && <div className="self-start px-3.5 py-2.5 rounded-2xl bg-white border border-paper-3 text-ink-3 text-[0.82rem]">Thinking...</div>}
           </div>
 
           <form
@@ -78,7 +172,7 @@ export default function FloatingChat() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask something about Cryptware…"
+              placeholder="Ask something about Cryptware..."
               className="flex-1 bg-paper-2 border border-paper-3 rounded-full px-4 py-2.5 text-[0.84rem] text-ink placeholder:text-ink-3/50 focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/15 transition-all duration-200"
             />
             <button

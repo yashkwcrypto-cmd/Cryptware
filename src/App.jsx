@@ -37,6 +37,19 @@ function HomePage() {
     return () => { document.body.style.overflow = 'auto'; };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    if (window.location.hash) {
+      // Small timeout to allow the DOM to fully render
+      setTimeout(() => {
+        const target = document.querySelector(window.location.hash);
+        if (target) {
+          const targetY = target.getBoundingClientRect().top + window.scrollY - 72;
+          gsap.to(window, { duration: 1, scrollTo: { y: targetY }, ease: 'power3.inOut' });
+        }
+      }, 150);
+    }
+  }, []);
+
   const handleNavCatalog = (category) => {
     const target = document.querySelector('#catalog');
     if (target) {

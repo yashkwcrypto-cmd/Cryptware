@@ -26,7 +26,7 @@ function BookDemoPopup({ onClose, onBook }) {
   };
 
   return (
-    <div className="absolute bottom-4 right-4 md:right-[-60px] lg:right-[-240px] z-40">
+    <div className="absolute bottom-4 right-4 md:right-4 lg:right-4 z-40">
       <div
         ref={cardRef}
         className="relative w-[150px] h-[150px] pointer-events-auto"

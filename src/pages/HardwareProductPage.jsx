@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 import { catalogData, hardwareCategories } from '../data/catalog';
 import Navbar from '../components/Navbar';
+import MobileMenu from '../components/MobileMenu';
 import Footer from '../components/Footer';
 import FloatingChat from '../components/FloatingChat';
 import CustomCursor from '../components/CustomCursor';
@@ -239,7 +240,7 @@ function ProductCard({ item, onOpen, viewMode = 'grid' }) {
       >
         <div className="w-[100px] h-[100px] bg-gradient-to-br from-[#f8faff] to-white rounded-xl flex items-center justify-center flex-shrink-0 border border-gray-100 overflow-hidden">
           {!imgError && item.img ? (
-            <img src={item.img} alt={item.title} className="max-h-[80px] max-w-[80px] object-contain" onError={() => setImgError(true)} />
+            <img src={item.img} alt={item.title} className="w-full h-full object-cover" onError={() => setImgError(true)} />
           ) : (
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${catColor}15` }}>
               <Icon.Package c="w-5 h-5" style={{ color: catColor }} />
@@ -249,10 +250,7 @@ function ProductCard({ item, onOpen, viewMode = 'grid' }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-3 mb-1.5">
             <h3 className="font-bold text-[#0b0f1e] text-sm leading-tight group-hover:text-[#06a3da] transition-colors">{item.title}</h3>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {item.featured && <span className="w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center"><Icon.Star c="w-2.5 h-2.5 text-white" /></span>}
-              <span className="text-[0.58rem] font-bold px-2 py-0.5 rounded-md" style={{ background: `${catColor}12`, color: catColor }}>{item.brand}</span>
-            </div>
+            <span className="text-[0.58rem] font-bold px-2 py-0.5 rounded-md flex-shrink-0" style={{ background: `${catColor}12`, color: catColor }}>{item.brand}</span>
           </div>
           <p className="text-[#64748b] text-xs leading-relaxed line-clamp-2 mb-2">{item.description}</p>
           {item.models?.length > 0 && (
@@ -283,10 +281,10 @@ function ProductCard({ item, onOpen, viewMode = 'grid' }) {
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px)', backgroundSize: '20px 20px' }} />
 
         {!imgError && item.img ? (
-          <img src={item.img} alt={item.title} className="max-h-[160px] max-w-[80%] object-contain drop-shadow-sm group-hover:scale-[1.08] transition-transform duration-500 z-10 relative" onError={() => setImgError(true)} />
+          <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-[1.08] transition-transform duration-500" onError={() => setImgError(true)} />
         ) : (
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center z-10" style={{ background: `${catColor}15` }}>
-            <Icon.Package c="w-8 h-8" style={{ color: catColor }} />
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center" style={{ background: `${catColor}15` }}>
+            <Icon.Package c="w-10 h-10" style={{ color: catColor }} />
           </div>
         )}
 
@@ -296,13 +294,6 @@ function ProductCard({ item, onOpen, viewMode = 'grid' }) {
             {subcategoryNames[item.subcategory] || item.subcategory}
           </span>
         </div>
-
-        {/* Featured */}
-        {item.featured && (
-          <div className="absolute top-3 right-3 w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center">
-            <Icon.Star c="w-3 h-3 text-white" />
-          </div>
-        )}
 
         {/* Brand bottom-right */}
         {item.brand && (
@@ -331,11 +322,7 @@ function ProductCard({ item, onOpen, viewMode = 'grid' }) {
           </div>
         )}
 
-        <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
-          <span className="inline-flex items-center gap-1.5 text-[0.63rem] font-bold uppercase text-emerald-600">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            In Stock
-          </span>
+        <div className="mt-auto pt-3 flex items-center justify-end">
           <span className="flex items-center gap-1 text-[0.7rem] font-bold uppercase group-hover:gap-2 transition-all" style={{ color: catColor }}>
             Details
             <Icon.ArrowRight c="w-3 h-3" />
@@ -378,11 +365,17 @@ export default function HardwareProductPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = 'Hardware Products – Cryptware Infotech Solutions';
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [isMenuOpen]);
 
   useEffect(() => {
     setActiveCategory(searchParams.get('category') || 'all');
@@ -578,7 +571,8 @@ export default function HardwareProductPage() {
   return (
     <div className="relative min-h-screen bg-[#f8faff] font-sans text-[#1a1a2e] overflow-x-hidden">
       <CustomCursor />
-      <Navbar onMenuToggle={() => {}} isMenuOpen={false} onNavCatalog={() => {}} />
+      <Navbar onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} isMenuOpen={isMenuOpen} variant="hardware" />
+      <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} variant="hardware" />
 
       {/* ── TOP HEADER ─────────────────────────────────────────────────────────── */}
       <div className="pt-[72px] bg-[#0b0f1e] border-b border-white/[0.05]">
