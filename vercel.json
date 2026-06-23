@@ -11,9 +11,6 @@
     },
     "api/gemini.js": {
       "maxDuration": 35
-    },
-    "api/contact.js": {
-      "maxDuration": 10
     }
   }
 }
