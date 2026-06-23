@@ -596,8 +596,6 @@ export default function HardwareCatalogPage() {
             {/* RIGHT — Stats + capability cards */}
             <div className="relative flex flex-col gap-4">
               {/* Decorative rings */}
-              <div className="absolute -top-10 -right-10 w-72 h-72 rounded-full border border-[#06a3da]/8 pointer-events-none" />
-              <div className="absolute -top-4 -right-4 w-52 h-52 rounded-full border border-[#06a3da]/12 pointer-events-none" />
 
               {/* Main stat card */}
               <div className="bg-white/[0.04] border border-white/[0.1] rounded-3xl p-7 backdrop-blur-sm">

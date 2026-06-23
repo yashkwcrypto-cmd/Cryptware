@@ -6,8 +6,8 @@ export const hardwareCategories = [
     icon: 'printer',
     tagline: 'Print with precision at every scale',
     description: 'From ultra-portable mobile units to heavy-duty industrial workhorses, our barcode printer range covers every environment and volume requirement.',
-    heroImg: '/assets/img/Product/Barcode printer.jpg',
-    bgImg: '/assets/img/Product/printerBackground.jpg',
+    heroImg: '/assets/img/Product/Desktop.jpg',
+    bgImg: '/assets/img/Product/Desktop.jpg',
     subtypes: [
       'Mobile Printers',
       'Desktop Printers',
@@ -67,8 +67,8 @@ export const hardwareCategories = [
     icon: 'mobile',
     tagline: 'Enterprise mobility redefined',
     description: 'Rugged handheld devices, tablets, and wearable computers built for warehouse, retail, healthcare, and field service — powered by Android enterprise.',
-    heroImg: '/assets/img/Product/MobileComputers/MobileIMG.jpg',
-    bgImg: '/assets/img/Product/MobileComputers/Mobilecomputer.jpg',
+    heroImg: '/assets/img/Product/MobileComputers/Tablets.jpg',
+    bgImg: '/assets/img/Product/MobileComputers/Tablets.jpg',
     subtypes: [
       'Handheld Devices',
       'Tablets',

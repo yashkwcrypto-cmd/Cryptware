@@ -10,6 +10,8 @@ function SendMessageModal({ onClose }) {
   const cardRef = useRef(null);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -26,9 +28,42 @@ function SendMessageModal({ onClose }) {
     gsap.to(overlayRef.current, { opacity: 0, duration: 0.25, onComplete: onClose });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (isSending) return;
+
+    setIsSending(true);
+    setError(null);
+
+    try {
+      // Using FormSubmit.co - No API keys or .env required!
+      // Note: The first time you submit this form, FormSubmit will send an activation link to yashkw.crypto@gmail.com
+      const response = await fetch('https://formsubmit.co/ajax/yashkw.crypto@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 200) {
+        setSubmitted(true);
+      } else {
+        setError(data.message || 'Failed to send message.');
+      }
+    } catch (err) {
+      console.error('Contact form submission error:', err);
+      setError('An error occurred while sending your message. Please try again later.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -96,6 +131,12 @@ function SendMessageModal({ onClose }) {
                   <p className="text-ink-3 text-[0.8rem]">We'll never share your information with anyone.</p>
                 </div>
 
+                {error && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 text-[0.82rem] leading-snug">
+                    ⚠️ {error}
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
                     { label: 'Your Name', key: 'name', type: 'text', placeholder: 'John Doe' },
@@ -107,7 +148,8 @@ function SendMessageModal({ onClose }) {
                         required type={type} value={formData[key]}
                         onChange={(e) => setFormData(p => ({ ...p, [key]: e.target.value }))}
                         placeholder={placeholder}
-                        className="bg-paper-2 border border-paper-3 rounded-xl px-4 py-2.5 text-[0.88rem] text-ink placeholder:text-ink-3/40 focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/15 transition-all duration-200"
+                        disabled={isSending}
+                        className="bg-paper-2 border border-paper-3 rounded-xl px-4 py-2.5 text-[0.88rem] text-ink placeholder:text-ink-3/40 focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/15 transition-all duration-200 disabled:opacity-60"
                       />
                     </div>
                   ))}
@@ -120,19 +162,23 @@ function SendMessageModal({ onClose }) {
                     value={formData.message}
                     onChange={(e) => setFormData(p => ({ ...p, message: e.target.value }))}
                     placeholder="Tell us about your project, goals, or anything you'd like us to know..."
-                    className="bg-paper-2 border border-paper-3 rounded-xl px-4 py-3 text-[0.88rem] text-ink placeholder:text-ink-3/40 focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/15 transition-all duration-200 resize-none"
+                    disabled={isSending}
+                    className="bg-paper-2 border border-paper-3 rounded-xl px-4 py-3 text-[0.88rem] text-ink placeholder:text-ink-3/40 focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/15 transition-all duration-200 resize-none disabled:opacity-60"
                   />
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-1">
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-brand hover:bg-brand-h text-white text-[0.88rem] font-semibold rounded-full transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_10px_28px_rgba(6,163,218,0.3)] cursor-pointer"
+                    disabled={isSending}
+                    className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-brand hover:bg-brand-h text-white text-[0.88rem] font-semibold rounded-full transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_10px_28px_rgba(6,163,218,0.3)] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
                   >
-                    Send Message
-                    <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
+                    {isSending ? 'Sending...' : 'Send Message'}
+                    {!isSending && (
+                      <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                      </svg>
+                    )}
                   </button>
                   <p className="text-ink-3/50 text-[0.72rem]">🔒 Your info stays private</p>
                 </div>
@@ -219,7 +265,9 @@ export default function Contact({ initialMessage }) {
                   Send us a Message
                 </button>
                 <a
-                  href="mailto:info@cryptwareinfotech.com?subject=Project%20Inquiry%20%E2%80%94%20Cryptware%20Infotech&body=Hi%20Cryptware%20team%2C%0A%0AI%27m%20interested%20in%20discussing%20a%20project.%0A%0AName%3A%0ACompany%3A%0ATimeline%3A%0ABudget%20range%3A%0A%0ALooking%20forward%20to%20hearing%20from%20you!"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=yashkw.crypto@gmail.com&su=Project%20Inquiry"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 border border-white/10 hover:border-white/25 text-white/60 hover:text-white text-[0.9rem] font-medium rounded-full transition-all duration-300 hover:bg-white/[0.04]"
                 >
                   <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

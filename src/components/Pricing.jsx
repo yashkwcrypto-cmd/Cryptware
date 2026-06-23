@@ -112,7 +112,7 @@ export default function Pricing() {
             </button>
             <span className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${annual ? 'text-ink' : 'text-ink-3'}`}>
               Annual
-              <span className="text-[0.65rem] bg-brand text-white px-1.5 py-0.5 rounded-full font-semibold tracking-wide">2 MONTHS FREE</span>
+              {/* <span className="text-[0.65rem] bg-brand text-white px-1.5 py-0.5 rounded-full font-semibold tracking-wide">2 MONTHS FREE</span> */}
             </span>
           </div>
         </div>
@@ -185,11 +185,10 @@ export default function Pricing() {
               {/* CTA */}
               <a
                 href="#contact-us"
-                className={`inline-flex text-[0.9rem] font-semibold px-6 py-3.5 rounded-full transition-all duration-300 ease-out items-center justify-center gap-2 ${
-                  plan.featured
+                className={`inline-flex text-[0.9rem] font-semibold px-6 py-3.5 rounded-full transition-all duration-300 ease-out items-center justify-center gap-2 ${plan.featured
                     ? 'bg-brand text-white hover:bg-brand/90 hover:scale-[1.05] hover:shadow-[0_8px_20px_-6px_rgba(6,163,218,0.5)]'
                     : 'bg-ink text-white hover:bg-ink/90 hover:scale-[1.05] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.5)]'
-                }`}
+                  }`}
               >
                 {plan.cta}
                 <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
