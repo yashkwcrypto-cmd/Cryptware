@@ -385,6 +385,51 @@ function SidebarSection({ title, children, defaultOpen = true }) {
 }
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
+const categoryUseCases = {
+  printers: [
+    "Retail price tagging & shelf labeling",
+    "Warehouse inventory & asset tracking",
+    "Shipping, receiving & logistics",
+    "Healthcare specimen & patient ID wristbands",
+    "Manufacturing product identification"
+  ],
+  scanners: [
+    "Retail point-of-sale (POS) checkout",
+    "Warehouse inventory management & picking",
+    "Healthcare medication administration",
+    "Library & document tracking",
+    "Field service & ticket verification"
+  ],
+  computing: [
+    "Warehouse management & picking operations",
+    "Retail in-store associate empowerment",
+    "Direct store delivery (DSD) & route accounting",
+    "Field service & mobile work orders",
+    "Transportation & logistics tracking"
+  ],
+  pos: [
+    "Retail checkout & store management",
+    "Restaurant & hospitality order processing",
+    "Mobile pop-up shops & event sales",
+    "Inventory syncing & customer loyalty",
+    "Self-service kiosks"
+  ],
+  rfid: [
+    "High-volume automated inventory counts",
+    "Supply chain track-and-trace visibility",
+    "High-value asset tracking & security",
+    "Contactless access control",
+    "Manufacturing work-in-process tracking"
+  ],
+  consumables: [
+    "Durable product & asset identification",
+    "Tamper-evident security labeling",
+    "Compliance shipping labels",
+    "Extreme-environment & chemical-resistant tagging",
+    "Food-safe & temperature-sensitive labels"
+  ]
+};
+
 export default function HardwareProductPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCat = searchParams.get('category') || 'all';
@@ -398,6 +443,7 @@ export default function HardwareProductPage() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
+  const [showUseCases, setShowUseCases] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -766,6 +812,12 @@ const filteredItems = useMemo(() => {
                   </span>
                 )}
                 <button onClick={clearAll} className="text-[0.68rem] font-bold text-red-500 hover:text-red-600 px-2 py-1.5">Clear All</button>
+                {activeCategory !== 'all' && (
+                  <button onClick={() => setShowUseCases(true)} className="text-[0.68rem] font-bold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg ml-auto flex items-center gap-1.5 transition-colors shadow-sm">
+                    <Icon.List c="w-3.5 h-3.5" />
+                    Common Use Cases
+                  </button>
+                )}
               </div>
             )}
 
@@ -856,6 +908,44 @@ const filteredItems = useMemo(() => {
       {/* ── DETAIL PANEL ─────────────────────────────────────────────────────── */}
       {selectedItem && (
         <DetailPanel item={selectedItem} onClose={() => setSelectedItem(null)} onInquiry={handleInquiry} />
+      )}
+
+      {/* ── USE CASES MODAL ──────────────────────────────────────────────────── */}
+      {showUseCases && activeCategory !== 'all' && categoryUseCases[activeCategory] && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowUseCases(false)} />
+          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform transition-all duration-300">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-gray-50 to-white">
+              <h3 className="font-bold text-[#0b0f1e] text-lg flex items-center gap-2">
+                {subcategoryNames[activeCategory]} Use Cases
+              </h3>
+              <button onClick={() => setShowUseCases(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
+                <Icon.Close c="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-gray-500 mb-4">
+                Common professional use cases for our {subcategoryNames[activeCategory].toLowerCase()} across all brands:
+              </p>
+              <ul className="space-y-3">
+                {categoryUseCases[activeCategory].map((useCase, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-sm text-gray-700 font-medium">
+                    <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Icon.Check c="w-3 h-3" />
+                    </span>
+                    {useCase}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+              <button onClick={() => setShowUseCases(false)} className="px-5 py-2 text-sm font-bold text-white bg-[#0b0f1e] hover:bg-gray-800 rounded-xl transition-colors">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       <Footer />
