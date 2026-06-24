@@ -47,6 +47,7 @@ const brandColors = {
   Zebra: '#0073cf', Honeywell: '#ee2e31', Datalogic: '#00803c', Epson: '#00417e',
   Posiflex: '#7c3aed', Newland: '#e65c00', Cryptware: '#06a3da',
   TSC: '#6d28d9', Godex: '#0f766e', Citizen: '#374151', Impinj: '#9333ea',
+  Hikrobot: '#eab308', CipherLab: '#3b82f6',
 };
 
 const subcategoryNames = {

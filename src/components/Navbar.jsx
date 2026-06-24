@@ -150,7 +150,7 @@ export default function Navbar({ onMenuToggle, isMenuOpen, variant = 'main' }) {
           <a
             href={nav.ctaHref}
             onClick={variant === 'main' ? (e) => handleMainLinkClick(e, nav.ctaHref) : undefined}
-            className="inline-flex text-[0.9rem] font-semibold px-5 py-2.5 md:px-6 bg-brand text-white rounded-full transition-all duration-300 ease-out hover:bg-brand-h hover:scale-[1.05] hover:shadow-[0_8px_20px_-6px_rgb(0,0,0,0.5)] items-center gap-2"
+            className="hidden md:inline-flex text-[0.9rem] font-semibold px-5 py-2.5 md:px-6 bg-brand text-white rounded-full transition-all duration-300 ease-out hover:bg-brand-h hover:scale-[1.05] hover:shadow-[0_8px_20px_-6px_rgb(0,0,0,0.5)] items-center gap-2"
           >
             {nav.ctaLabel}
             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
