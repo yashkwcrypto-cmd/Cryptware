@@ -22,6 +22,7 @@ import Footer from './components/Footer';
 import FloatingChat from './components/FloatingChat';
 import HardwareCatalogPage from './pages/HardwareCatalogPage';
 import HardwareProductPage from './pages/HardwareProductPage';
+import AdminDashboard from './pages/AdminDashboard';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 
@@ -112,6 +113,7 @@ export default function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/hardware" element={<HardwareCatalogPage />} />
       <Route path="/hardware/product" element={<HardwareProductPage />} />
+      <Route path="/admin" element={<AdminDashboard />} />
       {/* fallback */}
       <Route path="*" element={<HomePage />} />
     </Routes>

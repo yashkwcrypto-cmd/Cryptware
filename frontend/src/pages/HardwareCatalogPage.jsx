@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import axios from "axios";
+import { fetchProducts } from "../services/api";
 import { Link } from "react-router-dom";
 import { hardwareCategories, hardwareIndustries } from "../data/catalog";
 import Navbar from "../components/Navbar";
@@ -440,6 +442,36 @@ export default function HardwareCatalogPage() {
   const [hoveredCat, setHoveredCat] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [inquiryMessage, setInquiryMessage] = useState("");
+  const [liveProducts, setLiveProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchLiveProducts = async () => {
+      try {
+        const data = await fetchProducts();
+        if (data) {
+          setLiveProducts(data.filter(p => p.type === 'hardware'));
+        }
+      } catch (err) {
+        console.error("Failed to fetch live products", err);
+      }
+    };
+    fetchLiveProducts();
+  }, []);
+
+  const productCountsByCategory = useMemo(() => {
+    const counts = {};
+    liveProducts.forEach(p => {
+      if (p.subcategory) {
+        counts[p.subcategory] = (counts[p.subcategory] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [liveProducts]);
+
+  const totalLiveProducts = liveProducts.length > 0 ? liveProducts.length.toString() : "500";
+  const uniqueLiveBrands = liveProducts.length > 0 
+    ? new Set(liveProducts.map(p => p.brand).filter(Boolean)).size.toString()
+    : "10";
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -615,8 +647,8 @@ export default function HardwareCatalogPage() {
                 <div className="grid grid-cols-2 gap-5 mb-6">
                   {[
                     {
-                      value: "500",
-                      suffix: "+",
+                      value: totalLiveProducts,
+                      suffix: liveProducts.length > 0 ? "" : "+",
                       label: "Products in Catalog",
                       IconC: Icon.Package,
                     },
@@ -782,7 +814,7 @@ export default function HardwareCatalogPage() {
                         <CatIcon className="w-5 h-5 text-white" />
                       </div>
                       <div className="bg-black/35 border border-white/18 backdrop-blur-sm text-white text-[0.6rem] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
-                        {cat.productCount}+ Products
+                        {productCountsByCategory[cat.id] || cat.productCount}{liveProducts.length === 0 ? "+" : ""} Products
                       </div>
                     </div>
 
@@ -875,15 +907,9 @@ export default function HardwareCatalogPage() {
                       </ul>
                     </div>
 
-                    {/* CTA */}
                     <Link
                       to={`/hardware/product?category=${cat.id}`}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-[0.8rem] uppercase tracking-wider transition-all duration-300"
-                      style={{
-                        background:
-                          hoveredCat === cat.id ? cat.color : `${cat.color}10`,
-                        color: hoveredCat === cat.id ? "white" : cat.color,
-                      }}
+                      className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-[0.8rem] uppercase tracking-wider transition-all duration-300 ${hoveredCat === cat.id ? 'bg-[#1e293b] text-white shadow-[0_8px_16px_rgba(30,41,59,0.2)]' : 'bg-[#f1f5f9] text-[#475569]'}`}
                     >
                       Browse {cat.title}
                       <Icon.ArrowRight className="w-3.5 h-3.5" />
@@ -913,8 +939,8 @@ export default function HardwareCatalogPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(6,163,218,0.06)_0%,transparent_70%)] pointer-events-none" />
         <div className="relative z-10 w-[92%] max-w-[1280px] mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-            <AnimatedStat end="500" suffix="+" label="Products in Catalog" />
-            <AnimatedStat end="10" suffix="+" label="Trusted Brands" />
+            <AnimatedStat end={totalLiveProducts} suffix={liveProducts.length > 0 ? "" : "+"} label="Products in Catalog" />
+            <AnimatedStat end={uniqueLiveBrands} suffix={liveProducts.length > 0 ? "" : "+"} label="Trusted Brands" />
             <AnimatedStat end="1000" suffix="+" label="Clients Served" />
             <AnimatedStat end="6" suffix="" label="Industry Verticals" />
           </div>

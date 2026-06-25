@@ -138,7 +138,7 @@ export default function Navbar({ onMenuToggle, isMenuOpen, variant = 'main' }) {
                   key={link.label}
                   href={link.href}
                   onClick={variant === 'main' ? (e) => handleMainLinkClick(e, link.href) : undefined}
-                  className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${isActive ? 'text-[#214177] after:w-full' : (isHardware ? 'text-white/80' : 'text-[#214177] after:w-0 hover:text-[#214177] hover:after:w-full')}`}
+                  className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${isActive ? (isHardware ? 'text-brand after:w-full' : 'text-[#214177] after:w-full') : (isHardware ? 'text-white/70 hover:text-white hover:after:w-full after:w-0' : 'text-[#214177] after:w-0 hover:text-brand hover:after:w-full')}`}
                 >
                   {link.icon}
                   {link.label}

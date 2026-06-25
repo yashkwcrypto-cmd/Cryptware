@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generateAIContent } from '../data/ai';
+import { fetchAiRecommendation } from '../services/api';
 
 function formatInline(text) {
   const nodes = [];
@@ -114,7 +114,7 @@ export default function FloatingChat() {
     setLoading(true);
     try {
       const history = messages.map((m) => ({ role: m.from === 'user' ? 'user' : 'assistant', content: m.text }));
-      const reply = await generateAIContent(userMsg, history);
+      const reply = await fetchAiRecommendation(userMsg, history);
       const botMsg = typeof reply === 'string' ? reply : reply?.text || reply?.error || 'Something went wrong. Please try again later.';
       setMessages((m) => [...m, { from: 'bot', text: botMsg }]);
     } catch {

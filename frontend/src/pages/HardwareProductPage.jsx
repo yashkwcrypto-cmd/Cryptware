@@ -1,8 +1,10 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import axios from 'axios';
+import { fetchProducts as fetchProductsApi } from '../services/api';
 import { Link, useSearchParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
-import { catalogData, hardwareCategories } from '../data/catalog';
+import { hardwareCategories } from '../data/catalog';
 import Navbar from '../components/Navbar';
 import MobileMenu from '../components/MobileMenu';
 import Footer from '../components/Footer';
@@ -11,25 +13,25 @@ import CustomCursor from '../components/CustomCursor';
 
 // ─── SVG Icon Library (zero emojis) ───────────────────────────────────────────
 const Icon = {
-  Printer:     ({ c }) => <svg className={c||'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>,
-  Scanner:     ({ c }) => <svg className={c||'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>,
-  Mobile:      ({ c }) => <svg className={c||'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
-  POS:         ({ c }) => <svg className={c||'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>,
-  RFID:        ({ c }) => <svg className={c||'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>,
-  Label:       ({ c }) => <svg className={c||'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>,
-  All:         ({ c }) => <svg className={c||'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
-  Search:      ({ c }) => <svg className={c||'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>,
-  Close:       ({ c }) => <svg className={c||'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>,
-  ArrowRight:  ({ c }) => <svg className={c||'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>,
-  Check:       ({ c }) => <svg className={c||'w-3 h-3'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"><path d="M5 13l4 4L19 7"/></svg>,
-  Filter:      ({ c }) => <svg className={c||'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 5h18M7 12h10M10 19h4"/></svg>,
-  ChevronDown: ({ c }) => <svg className={c||'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M19 9l-7 7-7-7"/></svg>,
-  Shield:      ({ c }) => <svg className={c||'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
-  Star:        ({ c }) => <svg className={c||'w-4 h-4'} viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
-  Grid:        ({ c }) => <svg className={c||'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
-  List:        ({ c }) => <svg className={c||'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
-  Package:     ({ c }) => <svg className={c||'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
-  WhatsApp:    ({ c }) => <svg className={c||'w-4 h-4'} viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>,
+  Printer: ({ c }) => <svg className={c || 'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="12" height="8" /></svg>,
+  Scanner: ({ c }) => <svg className={c || 'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2" /><path d="M17 3h2a2 2 0 0 1 2 2v2" /><path d="M21 17v2a2 2 0 0 1-2 2h-2" /><path d="M7 21H5a2 2 0 0 1-2-2v-2" /><line x1="7" y1="12" x2="17" y2="12" /></svg>,
+  Mobile: ({ c }) => <svg className={c || 'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" /><line x1="12" y1="18" x2="12.01" y2="18" /></svg>,
+  POS: ({ c }) => <svg className={c || 'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>,
+  RFID: ({ c }) => <svg className={c || 'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0" /><path d="M1.42 9a16 16 0 0 1 21.16 0" /><path d="M8.53 16.11a6 6 0 0 1 6.95 0" /><circle cx="12" cy="20" r="1" fill="currentColor" /></svg>,
+  Label: ({ c }) => <svg className={c || 'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></svg>,
+  All: ({ c }) => <svg className={c || 'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>,
+  Search: ({ c }) => <svg className={c || 'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>,
+  Close: ({ c }) => <svg className={c || 'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>,
+  ArrowRight: ({ c }) => <svg className={c || 'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>,
+  Check: ({ c }) => <svg className={c || 'w-3 h-3'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"><path d="M5 13l4 4L19 7" /></svg>,
+  Filter: ({ c }) => <svg className={c || 'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 5h18M7 12h10M10 19h4" /></svg>,
+  ChevronDown: ({ c }) => <svg className={c || 'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M19 9l-7 7-7-7" /></svg>,
+  Shield: ({ c }) => <svg className={c || 'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
+  Star: ({ c }) => <svg className={c || 'w-4 h-4'} viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>,
+  Grid: ({ c }) => <svg className={c || 'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>,
+  List: ({ c }) => <svg className={c || 'w-4 h-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>,
+  Package: ({ c }) => <svg className={c || 'w-5 h-5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></svg>,
+  WhatsApp: ({ c }) => <svg className={c || 'w-4 h-4'} viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>,
 };
 
 // ─── Data maps ─────────────────────────────────────────────────────────────────
@@ -86,7 +88,7 @@ const industryOptions = [
 ];
 
 // ─── Detail Panel ─────────────────────────────────────────────────────────────
-function DetailPanel({ item, onClose, onInquiry }) {
+function DetailPanel({ item, onClose, onInquiry, products = [] }) {
   const panelRef = useRef(null);
   const overlayRef = useRef(null);
   const [imgError, setImgError] = useState(false);
@@ -202,7 +204,7 @@ function DetailPanel({ item, onClose, onInquiry }) {
             <div>
               <p className="text-[0.65rem] font-bold uppercase tracking-widest text-[#94a3b8] mb-3">You May Also Like</p>
               <div className="flex flex-wrap gap-2">
-                {catalogData.filter(p => p.type === 'hardware' && p.subcategory === item.subcategory && p.id !== item.id).slice(0, 4).map(r => (
+                {products.filter(p => p.type === 'hardware' && p.subcategory === item.subcategory && p.id !== item.id).slice(0, 4).map(r => (
                   <span key={r.id} className="text-xs font-medium px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-[#475569] hover:border-[#06a3da]/40 hover:text-[#06a3da] cursor-pointer transition-colors">{r.title}</span>
                 ))}
               </div>
@@ -446,6 +448,24 @@ export default function HardwareProductPage() {
   const [showUseCases, setShowUseCases] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchProductsApi();
+        setProducts(data);
+      } catch (err) {
+        setApiError(err.message || 'Failed to fetch products');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -471,7 +491,7 @@ export default function HardwareProductPage() {
     setSearchParams(searchParams);
   };
 
-  const hardwareItems = useMemo(() => catalogData.filter(i => i.type === 'hardware'), []);
+  const hardwareItems = useMemo(() => products.filter(i => i.type === 'hardware'), [products]);
   const totalCount = hardwareItems.length;
 
   const availableBrands = useMemo(() => {
@@ -484,19 +504,19 @@ export default function HardwareProductPage() {
     return Object.entries(brandCount).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
   }, [hardwareItems, activeCategory]);
 
-const filteredItems = useMemo(() => {
+  const filteredItems = useMemo(() => {
     let items = hardwareItems.filter(item => {
       const matchesCat = activeCategory === 'all' || item.subcategory === activeCategory;
       const sq = searchQuery.toLowerCase();
       const matchesSearch = !sq || item.title.toLowerCase().includes(sq) || item.description.toLowerCase().includes(sq) || (item.brand || '').toLowerCase().includes(sq);
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(item.brand || 'Cryptware');
-      
+
       const itemText = (item.title + ' ' + item.description + ' ' + (item.models || []).join(' ')).toLowerCase();
       const matchesSubtype = selectedSubtypes.length === 0 || selectedSubtypes.some(s => itemText.includes(s.toLowerCase()));
-      
+
       const categoryIndustries = hardwareCategories.find(c => c.id === item.subcategory)?.industries || [];
       const matchesIndustry = selectedIndustries.length === 0 || selectedIndustries.some(ind => categoryIndustries.includes(ind));
-      
+
       return matchesCat && matchesSearch && matchesBrand && matchesSubtype && matchesIndustry;
     });
 
@@ -782,97 +802,113 @@ const filteredItems = useMemo(() => {
               </button>
             </div>
 
-            {/* Active filter chips */}
-            {(activeCategory !== 'all' || selectedBrands.length > 0 || selectedSubtypes.length > 0 || selectedIndustries.length > 0 || searchQuery) && (
-              <div className="flex flex-wrap gap-2 mb-5">
-                {activeCategory !== 'all' && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#06a3da]/10 text-[#06a3da] text-[0.68rem] font-bold uppercase tracking-wider border border-[#06a3da]/20">
-                    {subcategoryNames[activeCategory]}
-                    <button onClick={() => handleCategoryChange('all')}><Icon.Close c="w-3 h-3" /></button>
-                  </span>
-                )}
-                {selectedBrands.map(brand => (
-                  <span key={brand} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#214177]/10 text-[#214177] text-[0.68rem] font-bold uppercase tracking-wider border border-[#214177]/20">
-                    {brand}<button onClick={() => toggleBrand(brand)}><Icon.Close c="w-3 h-3" /></button>
-                  </span>
-                ))}
-                {selectedSubtypes.map(s => (
-                  <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.68rem] font-bold uppercase tracking-wider border" style={{ background: `${currentCategoryColor}10`, color: currentCategoryColor, borderColor: `${currentCategoryColor}20` }}>
-                    {s}<button onClick={() => toggleSubtype(s)}><Icon.Close c="w-3 h-3" /></button>
-                  </span>
-                ))}
-                {selectedIndustries.map(ind => (
-                  <span key={ind} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-[0.68rem] font-bold uppercase tracking-wider border border-emerald-200">
-                    {ind}<button onClick={() => toggleIndustry(ind)}><Icon.Close c="w-3 h-3" /></button>
-                  </span>
-                ))}
-                {searchQuery && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#f1f5f9] text-[#475569] text-[0.68rem] font-bold border border-[#e2e8f0]">
-                    "{searchQuery}"<button onClick={() => setSearchQuery('')}><Icon.Close c="w-3 h-3" /></button>
-                  </span>
-                )}
-                <button onClick={clearAll} className="text-[0.68rem] font-bold text-red-500 hover:text-red-600 px-2 py-1.5">Clear All</button>
-                {activeCategory !== 'all' && (
-                  <button onClick={() => setShowUseCases(true)} className="text-[0.68rem] font-bold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg ml-auto flex items-center gap-1.5 transition-colors shadow-sm">
-                    <Icon.List c="w-3.5 h-3.5" />
-                    Common Use Cases
-                  </button>
-                )}
+            {loading && (
+              <div className="text-center py-20">
+                <p className="text-[#64748b] text-sm">Loading products...</p>
+              </div>
+            )}
+            {apiError && !loading && (
+              <div className="text-center py-20">
+                <p className="text-red-500 text-sm mb-4">{apiError}</p>
+                <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[#06a3da] text-white text-sm rounded-lg">Retry</button>
               </div>
             )}
 
-            {/* Result summary + per-page */}
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-sm text-[#64748b]">
-                Showing <span className="font-bold text-[#0b0f1e]">{displayedItems.length}</span> of <span className="font-bold text-[#0b0f1e]">{filteredItems.length}</span> products
-              </p>
-              {filteredItems.length > 12 && (
-                <div className="hidden sm:flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
-                  {[12, 24, 48].map(n => (
-                    <button
-                      key={n}
-                      onClick={() => setVisibleCount(n)}
-                      className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${visibleCount === n ? 'bg-[#0b0f1e] text-white' : 'text-[#64748b] hover:text-[#0b0f1e]'}`}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Grid / List */}
-            {displayedItems.length === 0 ? (
-              <div className="text-center py-24 bg-white rounded-2xl border border-dashed border-gray-200">
-                <div className="w-16 h-16 rounded-2xl bg-[#f1f5f9] flex items-center justify-center mx-auto mb-4">
-                  <Icon.Package c="w-8 h-8 text-[#94a3b8]" />
-                </div>
-                <h3 className="font-bold text-[#0b0f1e] text-lg mb-2">No products found</h3>
-                <p className="text-[#64748b] text-sm mb-6">Try adjusting your filters or search query.</p>
-                <button onClick={clearAll} className="px-6 py-2.5 rounded-xl bg-[#06a3da] text-white text-sm font-bold hover:bg-[#0591c4] transition-colors">
-                  Clear All Filters
-                </button>
-              </div>
-            ) : (
+            {!loading && !apiError && (
               <>
-                <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5' : 'flex flex-col gap-3'}>
-                  {displayedItems.map((item, idx) => (
-                    <ProductCard key={item.id} item={item} index={idx} onOpen={setSelectedItem} viewMode={viewMode} />
-                  ))}
+                {/* Active filter chips */}
+                {(activeCategory !== 'all' || selectedBrands.length > 0 || selectedSubtypes.length > 0 || selectedIndustries.length > 0 || searchQuery) && (
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {activeCategory !== 'all' && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#06a3da]/10 text-[#06a3da] text-[0.68rem] font-bold uppercase tracking-wider border border-[#06a3da]/20">
+                        {subcategoryNames[activeCategory]}
+                        <button onClick={() => handleCategoryChange('all')}><Icon.Close c="w-3 h-3" /></button>
+                      </span>
+                    )}
+                    {selectedBrands.map(brand => (
+                      <span key={brand} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#214177]/10 text-[#214177] text-[0.68rem] font-bold uppercase tracking-wider border border-[#214177]/20">
+                        {brand}<button onClick={() => toggleBrand(brand)}><Icon.Close c="w-3 h-3" /></button>
+                      </span>
+                    ))}
+                    {selectedSubtypes.map(s => (
+                      <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.68rem] font-bold uppercase tracking-wider border" style={{ background: `${currentCategoryColor}10`, color: currentCategoryColor, borderColor: `${currentCategoryColor}20` }}>
+                        {s}<button onClick={() => toggleSubtype(s)}><Icon.Close c="w-3 h-3" /></button>
+                      </span>
+                    ))}
+                    {selectedIndustries.map(ind => (
+                      <span key={ind} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-[0.68rem] font-bold uppercase tracking-wider border border-emerald-200">
+                        {ind}<button onClick={() => toggleIndustry(ind)}><Icon.Close c="w-3 h-3" /></button>
+                      </span>
+                    ))}
+                    {searchQuery && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#f1f5f9] text-[#475569] text-[0.68rem] font-bold border border-[#e2e8f0]">
+                        "{searchQuery}"<button onClick={() => setSearchQuery('')}><Icon.Close c="w-3 h-3" /></button>
+                      </span>
+                    )}
+                    <button onClick={clearAll} className="text-[0.68rem] font-bold text-red-500 hover:text-red-600 px-2 py-1.5">Clear All</button>
+                    {activeCategory !== 'all' && (
+                      <button onClick={() => setShowUseCases(true)} className="text-[0.68rem] font-bold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg ml-auto flex items-center gap-1.5 transition-colors shadow-sm">
+                        <Icon.List c="w-3.5 h-3.5" />
+                        Common Use Cases
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Result summary + per-page */}
+                <div className="flex items-center justify-between mb-5">
+                  <p className="text-sm text-[#64748b]">
+                    Showing <span className="font-bold text-[#0b0f1e]">{displayedItems.length}</span> of <span className="font-bold text-[#0b0f1e]">{filteredItems.length}</span> products
+                  </p>
+                  {filteredItems.length > 12 && (
+                    <div className="hidden sm:flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
+                      {[12, 24, 48].map(n => (
+                        <button
+                          key={n}
+                          onClick={() => setVisibleCount(n)}
+                          className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${visibleCount === n ? 'bg-[#0b0f1e] text-white' : 'text-[#64748b] hover:text-[#0b0f1e]'}`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Load more */}
-                {visibleCount < filteredItems.length && (
-                  <div className="mt-10 text-center">
-                    <button
-                      onClick={() => setVisibleCount(v => v + 12)}
-                      className="inline-flex items-center gap-2 px-8 py-3.5 bg-white border border-gray-200 rounded-full text-sm font-bold text-[#374151] hover:border-[#06a3da] hover:text-[#06a3da] hover:shadow-md transition-all duration-300 shadow-sm"
-                    >
-                      Load More Products
-                      <Icon.ChevronDown c="w-4 h-4" />
+                {/* Grid / List */}
+                {displayedItems.length === 0 ? (
+                  <div className="text-center py-24 bg-white rounded-2xl border border-dashed border-gray-200">
+                    <div className="w-16 h-16 rounded-2xl bg-[#f1f5f9] flex items-center justify-center mx-auto mb-4">
+                      <Icon.Package c="w-8 h-8 text-[#94a3b8]" />
+                    </div>
+                    <h3 className="font-bold text-[#0b0f1e] text-lg mb-2">No products found</h3>
+                    <p className="text-[#64748b] text-sm mb-6">Try adjusting your filters or search query.</p>
+                    <button onClick={clearAll} className="px-6 py-2.5 rounded-xl bg-[#06a3da] text-white text-sm font-bold hover:bg-[#0591c4] transition-colors">
+                      Clear All Filters
                     </button>
-                    <p className="text-xs text-[#94a3b8] mt-2">{filteredItems.length - visibleCount} more products</p>
                   </div>
+                ) : (
+                  <>
+                    <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5' : 'flex flex-col gap-3'}>
+                      {displayedItems.map((item, idx) => (
+                        <ProductCard key={item.id} item={item} index={idx} onOpen={setSelectedItem} viewMode={viewMode} />
+                      ))}
+                    </div>
+
+                    {/* Load more */}
+                    {visibleCount < filteredItems.length && (
+                      <div className="mt-10 text-center">
+                        <button
+                          onClick={() => setVisibleCount(v => v + 12)}
+                          className="inline-flex items-center gap-2 px-8 py-3.5 bg-white border border-gray-200 rounded-full text-sm font-bold text-[#374151] hover:border-[#06a3da] hover:text-[#06a3da] hover:shadow-md transition-all duration-300 shadow-sm"
+                        >
+                          Load More Products
+                          <Icon.ChevronDown c="w-4 h-4" />
+                        </button>
+                        <p className="text-xs text-[#94a3b8] mt-2">{filteredItems.length - visibleCount} more products</p>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -907,7 +943,7 @@ const filteredItems = useMemo(() => {
 
       {/* ── DETAIL PANEL ─────────────────────────────────────────────────────── */}
       {selectedItem && (
-        <DetailPanel item={selectedItem} onClose={() => setSelectedItem(null)} onInquiry={handleInquiry} />
+        <DetailPanel item={selectedItem} onClose={() => setSelectedItem(null)} onInquiry={handleInquiry} products={products} />
       )}
 
       {/* ── USE CASES MODAL ──────────────────────────────────────────────────── */}

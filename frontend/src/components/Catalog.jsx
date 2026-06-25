@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 import { catalogData } from '../data/catalog';
+import { fetchProducts } from '../services/api';
 
 const subcategoryNames = {
   'printers': 'Barcode Printers',
@@ -131,6 +132,16 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
   const [selectedItem, setSelectedItem] = useState(null);
   const [expandedFeatureIndex, setExpandedFeatureIndex] = useState(null);
 
+  const [dbSoftwareProducts, setDbSoftwareProducts] = useState([]);
+
+  useEffect(() => {
+    if (cat === 'software') {
+      fetchProducts({ type: 'software' })
+        .then(data => setDbSoftwareProducts(data || []))
+        .catch(err => console.error("Error fetching software products:", err));
+    }
+  }, [cat]);
+
   // ── Brand filter state ────────────────────────────────────────────────────
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [brandSectionOpen, setBrandSectionOpen] = useState(true);
@@ -181,8 +192,12 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
 
   // ── Filtered items (hardware now includes brand filter) ───────────────────
   const filteredItems = useMemo(() => {
+    // Merge DB products with static catalog data, preferring DB updates
+    const allProducts = [...catalogData, ...dbSoftwareProducts];
+    const uniqueSource = Array.from(new Map(allProducts.map(item => [item.id, item])).values());
+
     if (cat === 'software') {
-      return catalogData.filter(item => {
+      return uniqueSource.filter(item => {
         const isSoftwareItem = item.type === 'software' || item.subcategory === 'templates' || item.subcategory === 'textiles';
         const hasContent = item.description && item.description.length > 5;
         if (!isSoftwareItem || (!hasContent && item.subcategory !== 'templates')) return false;
@@ -195,19 +210,20 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
         else return ['software', 'office', 'eprocurement', 'accounting'].includes(item.subcategory);
       });
     } else {
-      return catalogData.filter(item => {
-        const matchesCategory = item.type === cat;
+      return uniqueSource.filter(item => {
+        const matchesCategory = item.type === cat || (!item.type && cat === 'hardware'); // default type hardware
         const matchesSubcategory = activeSubcategory === 'all' || item.subcategory === activeSubcategory;
         const searchLower = searchQuery.toLowerCase();
-        const matchesSearch = item.title.toLowerCase().includes(searchLower) || item.description.toLowerCase().includes(searchLower);
-        const hasContent = item.description.length > 5;
+        const itemDesc = item.description || "";
+        const matchesSearch = item.title.toLowerCase().includes(searchLower) || itemDesc.toLowerCase().includes(searchLower);
+        const hasContent = item.description && item.description.length > 5;
         // ── Brand filter ──
         const itemBrand = getBrand(item);
         const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(itemBrand);
         return matchesCategory && matchesSubcategory && matchesSearch && hasContent && matchesBrand;
       });
     }
-  }, [cat, activeSubcategory, searchQuery, softwareTab, selectedBrands]);
+  }, [cat, activeSubcategory, searchQuery, softwareTab, selectedBrands, dbSoftwareProducts]);
 
   const displayedItems = useMemo(() => {
     if (cat === 'hardware') return filteredItems.slice(0, hardwareVisibleCount);
