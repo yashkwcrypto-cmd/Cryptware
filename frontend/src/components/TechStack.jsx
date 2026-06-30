@@ -370,7 +370,7 @@ function MacHelloOverlay({ sectionRef, onDone }) {
 const techCategories = [
   {
     title: 'Front-End',
-    pills: ['HTML5', 'CSS3', 'JavaScript', 'React', 'Angular', 'Next js'],
+    pills: ['React.js', 'JavaScript', 'HTML5', 'CSS', 'Next js', 'Angular'],
     iconColor: 'text-orange-500',
     iconBg: 'bg-orange-500/10',
     icon: (
@@ -380,8 +380,8 @@ const techCategories = [
     )
   },
   {
-    title: 'Back-End',
-    pills: ['.NET Core', 'Node.js', 'Java'],
+    title: 'Back-End & APIs',
+    pills: ['Microsoft .NET Core', 'ASP.NET Core', 'C#', 'Node.js', 'WCF Services', 'Web API', 'REST APIs', 'Microservices', 'SignalR'],
     iconColor: 'text-emerald-500',
     iconBg: 'bg-emerald-500/10',
     icon: (
@@ -391,8 +391,8 @@ const techCategories = [
     )
   },
   {
-    title: 'Mobile',
-    pills: ['Flutter', 'Xamarin', 'Maui', 'React Native', 'iOS', 'Android'],
+    title: 'Mobile & Desktop',
+    pills: ['.NET MAUI', 'Xamarin', 'WinForms', 'Flutter', 'React Native', 'iOS', 'Android'],
     iconColor: 'text-violet-500',
     iconBg: 'bg-violet-500/10',
     icon: (
@@ -402,8 +402,8 @@ const techCategories = [
     )
   },
   {
-    title: 'Design & Data',
-    pills: ['Figma', 'Adobe XD', 'InVision', 'MongoDB', 'SQL'],
+    title: 'Database & ORM',
+    pills: ['SQL Server', 'MySQL', 'MongoDB', 'SQLite', 'Entity Framework Core', 'LINQ', 'Redis Cache'],
     iconColor: 'text-pink-500',
     iconBg: 'bg-pink-500/10',
     icon: (
@@ -413,13 +413,35 @@ const techCategories = [
     )
   },
   {
-    title: 'Cloud',
-    pills: ['AWS', 'Azure'],
+    title: 'Cloud & DevOps',
+    pills: ['Azure Services', 'Azure DevOps', 'AWS', 'Docker', 'CI/CD Pipelines', 'GitHub', 'Bitbucket'],
     iconColor: 'text-sky-500',
     iconBg: 'bg-sky-500/10',
     icon: (
       <svg className="w-[18px] h-[18px] stroke-current" fill="none" strokeWidth="1.5" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
+      </svg>
+    )
+  },
+  {
+    title: 'Integrations',
+    pills: ['Barcode', 'QR Code', 'Hardware Integrations'],
+    iconColor: 'text-yellow-500',
+    iconBg: 'bg-yellow-500/10',
+    icon: (
+      <svg className="w-[18px] h-[18px] stroke-current" fill="none" strokeWidth="1.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+      </svg>
+    )
+  },
+  {
+    title: 'Domains & Solutions',
+    pills: ['ERP', 'POS', 'Hotel POS', 'Warehouse Management', 'Inventory Solutions', 'Financial Services', 'Insurance', 'Healthcare Platforms'],
+    iconColor: 'text-teal-500',
+    iconBg: 'bg-teal-500/10',
+    icon: (
+      <svg className="w-[18px] h-[18px] stroke-current" fill="none" strokeWidth="1.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12.25" />
       </svg>
     )
   }
@@ -428,9 +450,65 @@ const techCategories = [
 /* ─── TechStack section ──────────────────────────────────────────────────── */
 export default function TechStack({ onQuoteRequest }) {
   const containerRef = useRef(null);
+  const scrollContainerRef = useRef(null);
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayDone, setOverlayDone] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const interactionTimeoutRef = useRef(null);
   const firedRef = useRef(false);
+  const manualScrollRef = useRef(false);
+  const manualScrollTimeout = useRef(null);
+
+  const displayCategories = [...techCategories, ...techCategories, ...techCategories, ...techCategories];
+
+  const handleInteractStart = () => {
+    setIsInteracting(true);
+    clearTimeout(interactionTimeoutRef.current);
+  };
+
+  const handleInteractEnd = () => {
+    interactionTimeoutRef.current = setTimeout(() => {
+      setIsInteracting(false);
+    }, 2000); // Resume auto-scroll 2 seconds after touch/hover ends
+  };
+
+  useEffect(() => {
+    let intervalId;
+    if (!isInteracting && !manualScrollRef.current) {
+      // Auto scroll every 5 seconds
+      intervalId = setInterval(() => {
+        if (scrollContainerRef.current) {
+          const scrollAmount = window.innerWidth < 768 ? 250 : 290;
+          scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+          
+          // Simple reset if we get near the end
+          if (
+            scrollContainerRef.current.scrollLeft >=
+            scrollContainerRef.current.scrollWidth - scrollContainerRef.current.clientWidth - 300
+          ) {
+            // Instantly reset to a similar position in the first set to loop seamlessly
+            scrollContainerRef.current.scrollLeft = 0;
+          }
+        }
+      }, 5000);
+    }
+    return () => clearInterval(intervalId);
+  }, [isInteracting]);
+
+  const handleManualScroll = (offset) => {
+    if (scrollContainerRef.current) {
+      manualScrollRef.current = true;
+      scrollContainerRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+      
+      clearTimeout(manualScrollTimeout.current);
+      manualScrollTimeout.current = setTimeout(() => {
+        manualScrollRef.current = false;
+      }, 800);
+    }
+  };
+
+  const scrollLeft = () => handleManualScroll(-350);
+  const scrollRight = () => handleManualScroll(350);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -515,42 +593,67 @@ export default function TechStack({ onQuoteRequest }) {
         )}
 
         {/* HEADER */}
-        <div className="mb-16">
-          <span className="tech-fade-up eyebrow text-brand tracking-widest uppercase text-xs font-semibold mb-3 block">
-            Our tech stack
-          </span>
-          <h2 className="tech-title tech-fade-up font-serif text-[clamp(2.2rem,3.8vw,3.4rem)] leading-[1.12] text-ink font-normal">
-            Built with the best <em className="text-ink not-italic">tools available</em>
-          </h2>
+        <div className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <span className="tech-fade-up eyebrow text-brand tracking-widest uppercase text-xs font-semibold mb-3 block">
+              Our tech stack
+            </span>
+            <h2 className="tech-title tech-fade-up font-serif text-[clamp(2.2rem,3.8vw,3.4rem)] leading-[1.12] text-ink font-normal">
+              Built with the best <em className="text-ink not-italic">tools available</em>
+            </h2>
+          </div>
+          <div className="hidden md:flex items-center gap-3 tech-fade-up">
+            <button onClick={scrollLeft} className="w-12 h-12 rounded-full border border-paper-3 flex items-center justify-center hover:bg-brand hover:text-white hover:border-brand transition-colors text-ink-3 shadow-sm">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <button onClick={scrollRight} className="w-12 h-12 rounded-full border border-paper-3 flex items-center justify-center hover:bg-brand hover:text-white hover:border-brand transition-colors text-ink-3 shadow-sm">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
         </div>
 
         {/* TECH GRID */}
-        <div className="tech-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-          {techCategories.map((cat, index) => (
+        <div 
+          ref={scrollContainerRef}
+          onMouseEnter={handleInteractStart}
+          onMouseLeave={handleInteractEnd}
+          onTouchStart={handleInteractStart}
+          onTouchEnd={handleInteractEnd}
+          className="tech-grid flex overflow-x-auto pb-12 snap-x snap-mandatory gap-4 md:gap-5 w-full [&::-webkit-scrollbar]:hidden" 
+          style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+        >
+          {displayCategories.map((cat, index) => (
             <div
               key={index}
-              className="tech-cell bg-paper hover:bg-white hover:shadow-[0_10px_35px_rgba(11,11,15,0.02)] p-8 rounded-2xl transition-all duration-300 border border-paper-3/20 flex flex-col gap-6 group"
+              className="snap-start flex-shrink-0 w-[230px] md:w-[260px] xl:w-[270px] h-full"
             >
-              {/* Category Header */}
-              <div className="flex items-center gap-3 text-[0.875rem] font-semibold text-ink uppercase tracking-wider">
-                <div className={`w-8 h-8 rounded-lg ${cat.iconBg} ${cat.iconColor} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-                  {cat.icon}
-                </div>
-                <span>{cat.title}</span>
-              </div>
+              <div
+                className="tech-cell relative h-full bg-paper p-5 md:p-6 rounded-2xl transition-all duration-300 ease-out border border-paper-3/20 flex flex-col gap-4 group hover:bg-white hover:shadow-[0_15px_40px_rgba(6,163,218,0.12)] hover:-translate-y-2 hover:border-brand/30"
+              >
+                {/* Highlight Glow Effect on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-brand/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"></div>
 
-              {/* Tech list */}
-              <ul className="space-y-3">
-                {cat.pills.map((pill, pIndex) => (
-                  <li
-                    key={pIndex}
-                    className="rounded-2xl border border-paper-3/70 bg-brand-light/10 px-4 py-3 flex items-center gap-3 text-[0.95rem] leading-[1.6] text-ink-2 shadow-[0_10px_25px_rgba(6,163,218,0.05)] transition-all duration-300 group-hover:bg-brand-light/20"
-                  >
-                    <span className="grid place-items-center h-3.5 w-3.5 rounded-full bg-brand flex-shrink-0 text-white shadow-sm" />
-                    <span>{pill}</span>
-                  </li>
-                ))}
-              </ul>
+                {/* Category Header */}
+                <div className="flex items-center gap-3 text-[0.8rem] font-bold text-ink uppercase tracking-wider relative z-10 transition-transform duration-300 group-hover:translate-x-1">
+                  <div className={`w-9 h-9 rounded-xl ${cat.iconBg} ${cat.iconColor} flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:shadow-md transition-all duration-300 shadow-sm border border-paper-3/30`}>
+                    {cat.icon}
+                  </div>
+                  <span>{cat.title}</span>
+                </div>
+
+                {/* Tech list */}
+                <ul className="space-y-2 relative z-10">
+                  {cat.pills.map((pill, pIndex) => (
+                    <li
+                      key={pIndex}
+                      className="rounded-xl border border-paper-3/70 bg-brand-light/10 px-3.5 py-2 flex items-center gap-2.5 text-[0.85rem] leading-[1.4] text-ink-2 shadow-sm transition-all duration-300 group-hover/item:bg-brand-light/20 hover:-translate-y-0.5 group/item cursor-default"
+                    >
+                      <span className="grid place-items-center h-2 w-2 rounded-full bg-brand flex-shrink-0 shadow-[0_0_5px_rgba(6,163,218,0.5)] group-hover/item:shadow-[0_0_8px_rgba(6,163,218,0.8)] transition-shadow" />
+                      <span className="font-medium">{pill}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           ))}
         </div>

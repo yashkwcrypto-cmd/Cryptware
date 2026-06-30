@@ -192,7 +192,7 @@ export default function Hero({ isHardwareRoute = false }) {
                 <div className="mt-7 grid max-w-[620px] grid-cols-3 gap-3 border-t border-white/10 pt-5">
                   {[
                     ['48h', 'deployment plan'],
-                    ['10/5', 'support desk'],
+                    ['24/7', 'support desk'],
                     ['360', 'site rollout']
                   ].map(([value, label]) => (
                     <div key={label} className="min-w-0">

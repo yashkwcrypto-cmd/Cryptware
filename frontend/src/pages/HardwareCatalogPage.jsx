@@ -15,14 +15,14 @@ import About from "../components/About";
 const trustedBrands = [
   { name: "Zebra", color: "#0073cf" },
   { name: "Honeywell", color: "#ee2e31" },
+  { name: "Hikrobot", color: "#374151" },
   { name: "Datalogic", color: "#00803c" },
-  { name: "Epson", color: "#00417e" },
   { name: "Posiflex", color: "#7c3aed" },
+  { name: "Rugtek", color: "#374151" },
   { name: "Newland", color: "#e65c00" },
   { name: "TSC", color: "#6d28d9" },
   { name: "Godex", color: "#0f766e" },
   { name: "Citizen", color: "#374151" },
-  { name: "Impinj", color: "#9333ea" },
 ];
 
 // ─── SVG Icons (no emojis) ─────────────────────────────────────────────────────
@@ -443,21 +443,26 @@ export default function HardwareCatalogPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [inquiryMessage, setInquiryMessage] = useState("");
   const [liveProducts, setLiveProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   useEffect(() => {
     const fetchLiveProducts = async () => {
       try {
-        const data = await fetchProducts();
+        setLoadingProducts(true);
+        const data = await fetchProducts({ type: 'hardware' });
         if (data) {
-          setLiveProducts(data.filter(p => p.type === 'hardware'));
+          setLiveProducts(data);
         }
       } catch (err) {
         console.error("Failed to fetch live products", err);
+      } finally {
+        setLoadingProducts(false);
       }
     };
     fetchLiveProducts();
   }, []);
 
+  // Derive product counts per main category (subcategory column in DB)
   const productCountsByCategory = useMemo(() => {
     const counts = {};
     liveProducts.forEach(p => {
@@ -468,8 +473,44 @@ export default function HardwareCatalogPage() {
     return counts;
   }, [liveProducts]);
 
+  // Derive distinct brands per category from backend
+  const brandsByCategory = useMemo(() => {
+    const map = {};
+    liveProducts.forEach(p => {
+      if (p.subcategory && p.brand) {
+        if (!map[p.subcategory]) map[p.subcategory] = new Set();
+        map[p.subcategory].add(p.brand);
+      }
+    });
+    // Convert Sets to arrays
+    const result = {};
+    Object.entries(map).forEach(([cat, set]) => {
+      result[cat] = Array.from(set);
+    });
+    return result;
+  }, [liveProducts]);
+
+  // Derive distinct printerType/classification values per category as subtypes
+  const subtypesByCategory = useMemo(() => {
+    const map = {};
+    liveProducts.forEach(p => {
+      if (p.subcategory) {
+        const subVal = p.printerType || p.classification || null;
+        if (subVal) {
+          if (!map[p.subcategory]) map[p.subcategory] = new Set();
+          map[p.subcategory].add(subVal);
+        }
+      }
+    });
+    const result = {};
+    Object.entries(map).forEach(([cat, set]) => {
+      result[cat] = Array.from(set);
+    });
+    return result;
+  }, [liveProducts]);
+
   const totalLiveProducts = liveProducts.length > 0 ? liveProducts.length.toString() : "500";
-  const uniqueLiveBrands = liveProducts.length > 0 
+  const uniqueLiveBrands = liveProducts.length > 0
     ? new Set(liveProducts.map(p => p.brand).filter(Boolean)).size.toString()
     : "10";
 
@@ -721,7 +762,7 @@ export default function HardwareCatalogPage() {
                     Cryptware Assurance
                   </p>
                   <p className="text-white/45 text-xs leading-relaxed mt-0.5">
-                    10/5 certified support · Warranty included · Rollout
+                    24/7 certified support · Warranty included · Rollout
                     training
                   </p>
                 </div>
@@ -808,8 +849,7 @@ export default function HardwareCatalogPage() {
                     {/* Top badges */}
                     <div className="absolute top-4 left-4 right-4 flex items-start justify-between gap-2">
                       <div
-                        className="w-11 h-11 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20"
-                        style={{ background: `${cat.color}28` }}
+                        className="w-11 h-11 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20 bg-[#06a3da]/25"
                       >
                         <CatIcon className="w-5 h-5 text-white" />
                       </div>
@@ -841,26 +881,29 @@ export default function HardwareCatalogPage() {
                         Sub-types
                       </p>
                       <div className="flex flex-wrap gap-1.5">
-                        {cat.subtypes.slice(0, 4).map((s) => (
-                          <span
-                            key={s}
-                            className="text-[0.65rem] font-semibold px-2.5 py-1 rounded-full bg-gray-50 border border-gray-200 text-[#475569]"
-                          >
-                            {s}
-                          </span>
-                        ))}
-                        {cat.subtypes.length > 4 && (
-                          <span
-                            className="text-[0.65rem] font-bold px-2.5 py-1 rounded-full"
-                            style={{
-                              background: `${cat.color}10`,
-                              color: cat.color,
-                              border: `1px solid ${cat.color}25`,
-                            }}
-                          >
-                            +{cat.subtypes.length - 4}
-                          </span>
-                        )}
+                        {(() => {
+                          const dynamicSubtypes = subtypesByCategory[cat.id];
+                          const subtypes = dynamicSubtypes && dynamicSubtypes.length > 0 ? dynamicSubtypes : cat.subtypes;
+                          return (
+                            <>
+                              {subtypes.slice(0, 4).map((s) => (
+                                <span
+                                  key={s}
+                                  className="text-[0.65rem] font-semibold px-2.5 py-1 rounded-full bg-gray-50 border border-gray-200 text-[#475569]"
+                                >
+                                  {s}
+                                </span>
+                              ))}
+                              {subtypes.length > 4 && (
+                                <span
+                                  className="text-[0.65rem] font-bold px-2.5 py-1 rounded-full bg-[#06a3da]/10 text-[#06a3da] border border-[#06a3da]/25"
+                                >
+                                  +{subtypes.length - 4}
+                                </span>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     </div>
 
@@ -868,21 +911,25 @@ export default function HardwareCatalogPage() {
                     <div className="mb-5">
                       <p className="text-[0.62rem] font-bold uppercase tracking-widest text-[#94a3b8] mb-2.5">
                         Brands
+                        {liveProducts.length > 0 && brandsByCategory[cat.id] && (
+                          <span className="ml-2 text-[#06a3da] normal-case font-bold">
+                            ({brandsByCategory[cat.id].length} live)
+                          </span>
+                        )}
                       </p>
                       <div className="flex flex-wrap gap-1.5">
-                        {cat.brands.map((brand) => (
-                          <span
-                            key={brand}
-                            className="text-[0.65rem] font-bold px-2.5 py-1 rounded-full"
-                            style={{
-                              background: `${cat.color}10`,
-                              color: cat.color,
-                              border: `1px solid ${cat.color}22`,
-                            }}
-                          >
-                            {brand}
-                          </span>
-                        ))}
+                        {(() => {
+                          const liveBrands = brandsByCategory[cat.id];
+                          const brands = liveBrands && liveBrands.length > 0 ? liveBrands : cat.brands;
+                          return brands.map((brand) => (
+                            <span
+                              key={brand}
+                              className="text-[0.65rem] font-bold px-2.5 py-1 rounded-full bg-[#06a3da]/10 text-[#06a3da] border border-[#06a3da]/20"
+                            >
+                              {brand}
+                            </span>
+                          ));
+                        })()}
                       </div>
                     </div>
 
@@ -898,8 +945,7 @@ export default function HardwareCatalogPage() {
                             className="flex items-center gap-2 text-xs text-[#475569]"
                           >
                             <Icon.Check
-                              className="w-3 h-3 flex-shrink-0"
-                              style={{ color: cat.color }}
+                              className="w-3 h-3 flex-shrink-0 text-[#06a3da]"
                             />
                             {spec}
                           </li>
@@ -941,7 +987,7 @@ export default function HardwareCatalogPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
             <AnimatedStat end={totalLiveProducts} suffix={liveProducts.length > 0 ? "" : "+"} label="Products in Catalog" />
             <AnimatedStat end={uniqueLiveBrands} suffix={liveProducts.length > 0 ? "" : "+"} label="Trusted Brands" />
-            <AnimatedStat end="1000" suffix="+" label="Clients Served" />
+            <AnimatedStat end="300" suffix="+" label="Clients Served" />
             <AnimatedStat end="6" suffix="" label="Industry Verticals" />
           </div>
         </div>
@@ -1114,12 +1160,21 @@ export default function HardwareCatalogPage() {
               Browse All Products
               <Icon.ArrowRight className="w-4 h-4" />
             </Link>
-            <Link
-              to="/#contact-us"
+            <a
+              href="#contact-us"
+              onClick={(e) => {
+                e.preventDefault();
+                const target = document.querySelector('#contact-us');
+                if (target) {
+                  const targetY = target.getBoundingClientRect().top + window.scrollY - 72;
+                  window.scrollTo({ top: targetY, behavior: 'smooth' });
+                  window.history.pushState(null, null, '#contact-us');
+                }
+              }}
               className="inline-flex items-center gap-2 px-9 py-4 border-2 border-[#0b0f1e]/15 text-[#0b0f1e] hover:border-[#06a3da] hover:text-[#06a3da] font-bold text-[0.82rem] uppercase tracking-wider rounded-full transition-all duration-300"
             >
               Request a Quote
-            </Link>
+            </a>
           </div>
         </div>
       </section>

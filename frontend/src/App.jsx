@@ -31,7 +31,7 @@ gsap.registerPlugin(ScrollToPlugin);
 // ─── Main Home Page ────────────────────────────────────────────────────────────
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [inquiryMessage, setInquiryMessage] = useState('');
+  const [inquiryMessage, setInquiryMessage] = useState(null);
 
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
@@ -88,10 +88,10 @@ function HomePage() {
         <WhyChooseUs />
         <Catalog
           activeCategory="software"
-          onQuoteRequest={(msg) => { setInquiryMessage(msg); scrollToContact(); }}
+          onQuoteRequest={(msg) => { setInquiryMessage({ text: msg, ts: Date.now() }); scrollToContact(); }}
         />
         <TechStack
-          onQuoteRequest={(msg) => { setInquiryMessage(msg); scrollToContact(); }}
+          onQuoteRequest={(msg) => { setInquiryMessage({ text: msg, ts: Date.now() }); scrollToContact(); }}
         />
         <TechLogos />
         <Benefits />

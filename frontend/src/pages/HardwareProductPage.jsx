@@ -68,8 +68,8 @@ const sidebarCategories = [
   { id: 'consumables', label: 'Labels & Tags' },
 ];
 
-// ─── Subcategory filters per category (from user spec) ─────────────────────────
-const subcategoryFilters = {
+// ─── Subcategory filters per category (dynamically derived from backend, fallback below) ────
+const subcategoryFiltersDefault = {
   printers: ['Mobile Printers', 'Desktop Printers', 'Industrial Printers', 'Enterprise Printers'],
   scanners: [
     'Handheld Scanners', 'Rugged Scanners', 'Hands-Free / Countertop', 'Presentation Scanners',
@@ -86,6 +86,296 @@ const subcategoryFilters = {
 const industryOptions = [
   'Retail', 'Healthcare', 'Manufacturing', 'Hospitality', 'Warehousing & Distribution', 'Transportation & Logistics',
 ];
+
+// ─── Label Quote Modal (for Consumables / Labels category) ───────────────────
+const MATERIAL_OPTIONS = [
+  'Plain Paper', 'Thermal Paper', 'Polyester (PET)', 'Polypropylene (PP)',
+  'Vinyl / PVC', 'Tyvek', 'Polyimide', 'BOPP', 'Nylon', 'Fabric / Woven',
+  'Food-Grade Paper', 'Aluminum Foil', 'Thermal Transfer Ribbon (Wax)',
+  'Thermal Transfer Ribbon (Wax-Resin)', 'Thermal Transfer Ribbon (Resin)',
+];
+
+function LabelQuoteModal({ item, onClose }) {
+  const overlayRef = useRef(null);
+  const modalRef = useRef(null);
+  const [form, setForm] = useState({
+    width: '', length: '', quantity: '', material: '', otherMaterial: '', specification: '',
+  });
+  const [quantityUnit, setQuantityUnit] = useState('Pcs');
+  const [sendVia, setSendVia] = useState('whatsapp'); // 'whatsapp' | 'email'
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    gsap.fromTo(overlayRef.current, { opacity: 0 }, { opacity: 1, duration: 0.25, ease: 'power2.out' });
+    gsap.fromTo(modalRef.current, { opacity: 0, scale: 0.92, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.38, ease: 'back.out(1.4)' });
+    const onKey = (e) => { if (e.key === 'Escape') handleClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const handleClose = () => {
+    gsap.to(overlayRef.current, { opacity: 0, duration: 0.2 });
+    gsap.to(modalRef.current, { opacity: 0, scale: 0.92, y: 20, duration: 0.25, ease: 'power2.in', onComplete: onClose });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+  };
+
+  const validate = () => {
+    const errs = {};
+    if (!form.width.trim()) errs.width = 'Required';
+    if (!form.length.trim()) errs.length = 'Required';
+    if (!form.quantity.trim()) errs.quantity = 'Required';
+    if (!form.material) errs.material = 'Required';
+    if (form.material === 'Other' && !form.otherMaterial.trim()) errs.otherMaterial = 'Required';
+    return errs;
+  };
+
+  const buildMessage = () => {
+    const productName = item?.title || 'Label / Consumable';
+    const brand = item?.brand ? ` (${item.brand})` : '';
+    return (
+      `Hi Cryptware! I'd like to request a quote for the following label requirement:\n\n` +
+      `- Product: ${productName}${brand}\n` +
+      `- Size: ${form.width} mm (W) × ${form.length} mm (L)\n` +
+      `- Quantity: ${form.quantity} ${quantityUnit}\n` +
+      `- Material: ${form.material === 'Other' ? form.otherMaterial : form.material}\n` +
+      (form.specification.trim() ? `- *Specifications:* ${form.specification.trim()}\n` : '') +
+      `\nPlease share the best pricing and lead time. Thank you!`
+    );
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    const message = buildMessage();
+
+    if (sendVia === 'whatsapp') {
+      window.open(`https://wa.me/917490971996?text=${encodeURIComponent(message)}`, '_blank');
+    } else if (sendVia === 'email') {
+      const subject = encodeURIComponent(`Label Quote Request — ${item?.title || 'Label'}`);
+      const body = encodeURIComponent(message);
+
+      // Robust cross-browser way to trigger mailto without getting blocked
+      const a = document.createElement('a');
+      a.href = `mailto:info@cryptwareinfotech.com?subject=${subject}&body=${body}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else if (sendVia === 'gmail') {
+      const subject = encodeURIComponent(`Label Quote Request — ${item?.title || 'Label'}`);
+      const body = encodeURIComponent(message);
+      window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=info@cryptwareinfotech.com&su=${subject}&body=${body}`, '_blank');
+    }
+
+    handleClose();
+  };
+
+  const inputCls = (field) =>
+    `w-full bg-[#f8faff] border ${errors[field] ? 'border-red-400 focus:ring-red-400/20' : 'border-gray-200 focus:border-[#06a3da] focus:ring-[#06a3da]/10'} rounded-xl px-4 py-3 text-sm text-[#0b0f1e] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 transition-all`;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+      <div ref={overlayRef} onClick={handleClose} className="absolute inset-0 bg-black/55 backdrop-blur-sm opacity-0" />
+      <div
+        ref={modalRef}
+        className="relative w-full max-w-[500px] bg-white rounded-3xl shadow-[0_32px_80px_rgba(0,0,0,0.22)] overflow-hidden"
+        style={{ opacity: 0 }}
+      >
+        {/* Header */}
+        <div className="relative bg-gradient-to-r from-[#0b0f1e] to-[#1a2035] px-6 py-5">
+          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'linear-gradient(rgba(6,163,218,1) 1px,transparent 1px),linear-gradient(90deg,rgba(6,163,218,1) 1px,transparent 1px)', backgroundSize: '28px 28px' }} />
+          <div className="relative flex items-start justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2 h-2 rounded-full bg-[#06a3da] shadow-[0_0_8px_rgba(6,163,218,0.8)]" />
+                <span className="text-[0.62rem] font-bold uppercase tracking-[0.2em] text-[#06a3da]">Label Quote Request</span>
+              </div>
+              <h3 className="text-lg font-bold text-white leading-snug">{item?.title || 'Custom Label'}</h3>
+              {item?.brand && <p className="text-white/40 text-xs mt-0.5">{item.brand}</p>}
+            </div>
+            <button onClick={handleClose} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors flex-shrink-0 mt-0.5">
+              <Icon.Close c="w-4 h-4 text-white" />
+            </button>
+          </div>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+          {/* Size row */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[0.65rem] font-bold uppercase tracking-widest text-[#94a3b8] mb-1.5">
+                Width <span className="text-[#06a3da]">(mm) *</span>
+              </label>
+              <input
+                name="width" type="number" min="1" value={form.width}
+                onChange={handleChange} placeholder="e.g. 50"
+                className={inputCls('width')}
+              />
+              {errors.width && <p className="text-red-500 text-[0.6rem] mt-1">{errors.width}</p>}
+            </div>
+            <div>
+              <label className="block text-[0.65rem] font-bold uppercase tracking-widest text-[#94a3b8] mb-1.5">
+                Length <span className="text-[#06a3da]">(mm) *</span>
+              </label>
+              <input
+                name="length" type="number" min="1" value={form.length}
+                onChange={handleChange} placeholder="e.g. 100"
+                className={inputCls('length')}
+              />
+              {errors.length && <p className="text-red-500 text-[0.6rem] mt-1">{errors.length}</p>}
+            </div>
+          </div>
+
+          {/* Quantity + Unit Toggle */}
+          <div>
+            <label className="block text-[0.65rem] font-bold uppercase tracking-widest text-[#94a3b8] mb-1.5">
+              Quantity <span className="text-[#06a3da]">*</span>
+            </label>
+            <div className="flex gap-2">
+              {/* Number input */}
+              <div className="relative flex-1">
+                <input
+                  name="quantity" type="number" min="1" value={form.quantity}
+                  onChange={handleChange} placeholder="e.g. 10000"
+                  className={`${inputCls('quantity')} pr-4`}
+                />
+              </div>
+              {/* Unit toggle pills */}
+              <div className="flex gap-1 flex-shrink-0 flex-wrap">
+                {['Pcs', 'Rolls', 'Boxes', 'Sheets', 'Mtrs'].map(unit => (
+                  <button
+                    key={unit}
+                    type="button"
+                    onClick={() => setQuantityUnit(unit)}
+                    className={`px-2.5 py-1.5 rounded-xl text-[0.65rem] font-bold border-2 transition-all duration-150 whitespace-nowrap ${quantityUnit === unit
+                      ? 'border-[#06a3da] bg-[#06a3da] text-white shadow-sm scale-[1.04]'
+                      : 'border-gray-200 bg-[#f8faff] text-[#64748b] hover:border-[#06a3da]/50 hover:text-[#06a3da]'
+                      }`}
+                  >
+                    {unit}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {errors.quantity && <p className="text-red-500 text-[0.6rem] mt-1">{errors.quantity}</p>}
+          </div>
+
+          {/* Material */}
+          <div className="space-y-3">
+            <div>
+              <label className="block text-[0.65rem] font-bold uppercase tracking-widest text-[#94a3b8] mb-1.5">
+                Material <span className="text-[#06a3da]">*</span>
+              </label>
+              <select
+                name="material" value={form.material} onChange={handleChange}
+                className={inputCls('material')}
+              >
+                <option value="">Select material...</option>
+                {MATERIAL_OPTIONS.map(m => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+                <option value="Other">Other (Please specify)</option>
+              </select>
+              {errors.material && <p className="text-red-500 text-[0.6rem] mt-1">{errors.material}</p>}
+            </div>
+
+            {form.material === 'Other' && (
+              <div>
+                <label className="block text-[0.65rem] font-bold uppercase tracking-widest text-[#94a3b8] mb-1.5">
+                  Specify Material <span className="text-[#06a3da]">*</span>
+                </label>
+                <input
+                  name="otherMaterial" type="text" value={form.otherMaterial}
+                  onChange={handleChange} placeholder="Enter material type"
+                  className={inputCls('otherMaterial')}
+                />
+                {errors.otherMaterial && <p className="text-red-500 text-[0.6rem] mt-1">{errors.otherMaterial}</p>}
+              </div>
+            )}
+          </div>
+
+          {/* Specification */}
+          <div>
+            <label className="block text-[0.65rem] font-bold uppercase tracking-widest text-[#94a3b8] mb-1.5">
+              Specification / Notes
+            </label>
+            <textarea
+              name="specification" value={form.specification} onChange={handleChange}
+              placeholder="e.g. Food-safe adhesive, black printing, 1 color, serial numbering, colour, special finish..."
+              rows={3}
+              className={`${inputCls('specification')} resize-none`}
+            />
+          </div>
+
+          {/* Send Via Selector */}
+          <div>
+            <label className="block text-[0.65rem] font-bold uppercase tracking-widest text-[#94a3b8] mb-2.5">
+              Send Quote Request Via
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setSendVia('whatsapp')}
+                className={`flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 text-[0.7rem] font-bold transition-all duration-200 ${sendVia === 'whatsapp'
+                  ? 'border-[#25d366] bg-[#25d366]/10 text-[#128c7e] shadow-sm'
+                  : 'border-gray-200 bg-[#f8faff] text-[#64748b] hover:border-[#25d366]/40'
+                  }`}
+              >
+                <Icon.WhatsApp c="w-4 h-4" />
+                WhatsApp
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSendVia('gmail')}
+                className={`flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 text-[0.7rem] font-bold transition-all duration-200 ${sendVia === 'gmail'
+                  ? 'border-[#ea4335] bg-[#ea4335]/10 text-[#ea4335] shadow-sm'
+                  : 'border-gray-200 bg-[#f8faff] text-[#64748b] hover:border-[#ea4335]/40'
+                  }`}
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" />
+                </svg>
+                Gmail
+              </button>
+            </div>
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            className="w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg flex items-center justify-center gap-2"
+            style={{
+              background: sendVia === 'whatsapp'
+                ? 'linear-gradient(135deg, #25d366, #128c7e)'
+                : sendVia === 'gmail'
+                  ? 'linear-gradient(135deg, #ea4335, #c5221f)'
+                  : 'linear-gradient(135deg, #06a3da, #214177)'
+            }}
+          >
+            {sendVia === 'whatsapp' ? <Icon.WhatsApp c="w-4 h-4" /> : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+            Send via {sendVia === 'whatsapp' ? 'WhatsApp' : sendVia === 'gmail' ? 'Gmail' : 'Mail App'}
+          </button>
+
+          <p className="text-center text-[0.6rem] text-[#94a3b8]">
+            Your details will be sent to our team. We'll respond within 24 hours.
+          </p>
+        </form>
+      </div>
+    </div>,
+    document.body
+  );
+}
 
 // ─── Detail Panel ─────────────────────────────────────────────────────────────
 function DetailPanel({ item, onClose, onInquiry, products = [] }) {
@@ -195,7 +485,7 @@ function DetailPanel({ item, onClose, onInquiry, products = [] }) {
                 </div>
                 <div>
                   <h5 className="font-bold text-[#0b0f1e] text-sm mb-1">Cryptware Assurance</h5>
-                  <p className="text-xs text-[#64748b] leading-relaxed">All hardware provisioning and deployments come with certified professional warranties, 10/5 support, and dedicated rollout training. We source only from authorized distributors.</p>
+                  <p className="text-xs text-[#64748b] leading-relaxed">All hardware provisioning and deployments come with certified professional warranties, 24/7 support, and dedicated rollout training. We source only from authorized distributors.</p>
                 </div>
               </div>
             </div>
@@ -231,20 +521,42 @@ function DetailPanel({ item, onClose, onInquiry, products = [] }) {
 }
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
-function ProductCard({ item, onOpen, viewMode = 'grid' }) {
+function ProductCard({ item, onOpen, onLabelQuote, viewMode = 'grid' }) {
   const [imgError, setImgError] = useState(false);
   const catColor = categoryColors[item.subcategory] || '#06a3da';
   const brandColor = brandColors[item.brand] || '#64748b';
+  const isLabel = item.subcategory === 'consumables';
+
+  const handleGetQuote = (e) => {
+    e.stopPropagation();
+    if (isLabel && onLabelQuote) {
+      onLabelQuote(item);
+    } else {
+      const msg = `Hi Cryptware! I'm interested in getting a quote for the *${item.title}*${item.brand ? ` by ${item.brand}` : ''}. Could you please share pricing and availability details? Thank you!`;
+      window.open(`https://wa.me/917490971996?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+  };
+
+  const QuoteBtn = ({ extraClass = '' }) => (
+    <button
+      onClick={handleGetQuote}
+      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[0.65rem] font-bold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg whitespace-nowrap ${extraClass}`}
+      style={{ background: isLabel ? 'linear-gradient(135deg, #06a3da, #214177)' : 'linear-gradient(135deg, #25d366, #128c7e)' }}
+      title={isLabel ? 'Get Custom Label Quote' : 'Get Quote on WhatsApp'}
+    >
+      {isLabel ? (
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path d="M9 12h6M9 16h6M17 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ) : <Icon.WhatsApp c="w-3.5 h-3.5" />}
+      Get Quote
+    </button>
+  );
 
   if (viewMode === 'list') {
     return (
-      <div
-        className="group bg-white rounded-2xl border border-gray-200/70 overflow-hidden shadow-sm hover:shadow-[0_10px_30px_rgba(6,163,218,0.1)] hover:border-[#06a3da]/20 transition-all duration-300 flex gap-4 p-4"
-      >
-        <div
-          onClick={() => onOpen(item)}
-          className="w-[100px] h-[100px] bg-gradient-to-br from-[#f8faff] to-white rounded-xl flex items-center justify-center flex-shrink-0 border border-gray-100 overflow-hidden cursor-pointer"
-        >
+      <div className="group bg-white rounded-2xl border border-gray-200/70 overflow-hidden shadow-sm hover:shadow-[0_10px_30px_rgba(6,163,218,0.1)] hover:border-[#06a3da]/20 transition-all duration-300 flex gap-4 p-4">
+        <div onClick={() => onOpen(item)} className="w-[100px] h-[100px] bg-gradient-to-br from-[#f8faff] to-white rounded-xl flex items-center justify-center flex-shrink-0 border border-gray-100 overflow-hidden cursor-pointer">
           {!imgError && item.img ? (
             <img src={item.img} alt={item.title} className="w-full h-full object-cover" onError={() => setImgError(true)} />
           ) : (
@@ -269,19 +581,8 @@ function ProductCard({ item, onOpen, viewMode = 'grid' }) {
           )}
         </div>
         <div className="flex flex-col items-center justify-center gap-2 flex-shrink-0">
-          <button
-            onClick={(e) => { e.stopPropagation(); const msg = `Hi Cryptware! I'm interested in getting a quote for the *${item.title}*${item.brand ? ` by ${item.brand}` : ''}. Could you please share pricing and availability details? Thank you!`; window.open(`https://wa.me/917490971996?text=${encodeURIComponent(msg)}`, '_blank'); }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[0.65rem] font-bold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg whitespace-nowrap"
-            style={{ background: 'linear-gradient(135deg, #25d366, #128c7e)' }}
-            title="Get Quote on WhatsApp"
-          >
-            <Icon.WhatsApp c="w-3.5 h-3.5" />
-            Get Quote
-          </button>
-          <div
-            onClick={() => onOpen(item)}
-            className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:translate-x-0.5 cursor-pointer" style={{ background: `${catColor}12`, color: catColor }}
-          >
+          <QuoteBtn />
+          <div onClick={() => onOpen(item)} className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:translate-x-0.5 cursor-pointer" style={{ background: `${catColor}12`, color: catColor }}>
             <Icon.ArrowRight c="w-4 h-4" />
           </div>
         </div>
@@ -290,16 +591,10 @@ function ProductCard({ item, onOpen, viewMode = 'grid' }) {
   }
 
   return (
-    <div
-      className="group bg-white rounded-2xl border border-gray-200/70 overflow-hidden shadow-sm hover:shadow-[0_20px_50px_rgba(6,163,218,0.12)] hover:-translate-y-2 transition-all duration-[400ms] ease-out flex flex-col"
-    >
+    <div className="group bg-white rounded-2xl border border-gray-200/70 overflow-hidden shadow-sm hover:shadow-[0_20px_50px_rgba(6,163,218,0.12)] hover:-translate-y-2 transition-all duration-[400ms] ease-out flex flex-col">
       {/* Image */}
-      <div
-        onClick={() => onOpen(item)}
-        className="relative h-[200px] bg-gradient-to-br from-[#f8faff] via-white to-[#f0f7ff] flex items-center justify-center overflow-hidden border-b border-gray-100 cursor-pointer"
-      >
+      <div onClick={() => onOpen(item)} className="relative h-[200px] bg-gradient-to-br from-[#f8faff] via-white to-[#f0f7ff] flex items-center justify-center overflow-hidden border-b border-gray-100 cursor-pointer">
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px)', backgroundSize: '20px 20px' }} />
-
         {!imgError && item.img ? (
           <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-[1.08] transition-transform duration-500" onError={() => setImgError(true)} />
         ) : (
@@ -307,33 +602,31 @@ function ProductCard({ item, onOpen, viewMode = 'grid' }) {
             <Icon.Package c="w-10 h-10" style={{ color: catColor }} />
           </div>
         )}
-
         {/* Category badge */}
         <div className="absolute top-3 left-3">
           <span className="text-[0.58rem] font-bold uppercase tracking-widest px-2 py-1 rounded-md backdrop-blur-sm" style={{ background: `${catColor}15`, color: catColor, border: `1px solid ${catColor}25` }}>
             {subcategoryNames[item.subcategory] || item.subcategory}
           </span>
         </div>
-
         {/* Brand bottom-right */}
         {item.brand && (
           <span className="absolute bottom-3 right-3 text-[0.56rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md backdrop-blur-sm bg-white/85 border border-gray-200" style={{ color: brandColor }}>
             {item.brand}
           </span>
         )}
-
-        {/* Color accent bar */}
+        {/* Label badge */}
+        {isLabel && (
+          <div className="absolute top-3 right-3 bg-[#06a3da]/90 text-white text-[0.55rem] font-bold uppercase tracking-wider px-2 py-1 rounded-md backdrop-blur-sm">
+            Custom Quote
+          </div>
+        )}
         <div className="absolute bottom-0 left-0 right-0 h-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: `linear-gradient(90deg, ${catColor}, transparent)` }} />
       </div>
 
       {/* Body */}
       <div className="p-5 flex-1 flex flex-col">
-        <h3
-          onClick={() => onOpen(item)}
-          className="font-bold text-[#0b0f1e] text-[0.95rem] leading-tight mb-2 group-hover:text-[#06a3da] transition-colors cursor-pointer"
-        >{item.title}</h3>
+        <h3 onClick={() => onOpen(item)} className="font-bold text-[#0b0f1e] text-[0.95rem] leading-tight mb-2 group-hover:text-[#06a3da] transition-colors cursor-pointer">{item.title}</h3>
         <p className="text-[#64748b] text-xs leading-relaxed line-clamp-2 flex-1">{item.description}</p>
-
         {item.models?.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-3">
             {item.models.slice(0, 2).map(m => (
@@ -344,22 +637,9 @@ function ProductCard({ item, onOpen, viewMode = 'grid' }) {
             )}
           </div>
         )}
-
         <div className="mt-auto pt-3 flex items-center justify-between gap-2">
-          <button
-            onClick={(e) => { e.stopPropagation(); const msg = `Hi Cryptware! I'm interested in getting a quote for the *${item.title}*${item.brand ? ` by ${item.brand}` : ''}. Could you please share pricing and availability details? Thank you!`; window.open(`https://wa.me/917490971996?text=${encodeURIComponent(msg)}`, '_blank'); }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[0.65rem] font-bold text-white transition-all duration-200 hover:scale-105 hover:shadow-md"
-            style={{ background: 'linear-gradient(135deg, #25d366, #128c7e)' }}
-            title="Get Quote on WhatsApp"
-          >
-            <Icon.WhatsApp c="w-3 h-3" />
-            Get Quote
-          </button>
-          <span
-            onClick={() => onOpen(item)}
-            className="flex items-center gap-1 text-[0.7rem] font-bold uppercase group-hover:gap-2 transition-all cursor-pointer"
-            style={{ color: catColor }}
-          >
+          <QuoteBtn />
+          <span onClick={() => onOpen(item)} className="flex items-center gap-1 text-[0.7rem] font-bold uppercase group-hover:gap-2 transition-all cursor-pointer" style={{ color: catColor }}>
             Details
             <Icon.ArrowRight c="w-3 h-3" />
           </span>
@@ -451,6 +731,7 @@ export default function HardwareProductPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState(null);
+  const [labelQuoteItem, setLabelQuoteItem] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -494,6 +775,7 @@ export default function HardwareProductPage() {
   const hardwareItems = useMemo(() => products.filter(i => i.type === 'hardware'), [products]);
   const totalCount = hardwareItems.length;
 
+  // Derive available brands per category from backend
   const availableBrands = useMemo(() => {
     const brandCount = {};
     hardwareItems.forEach(item => {
@@ -504,6 +786,48 @@ export default function HardwareProductPage() {
     return Object.entries(brandCount).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
   }, [hardwareItems, activeCategory]);
 
+  // Derive product counts per main category
+  const countsByCategory = useMemo(() => {
+    const counts = { all: hardwareItems.length };
+    hardwareItems.forEach(item => {
+      if (item.subcategory) {
+        counts[item.subcategory] = (counts[item.subcategory] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [hardwareItems]);
+
+  // Derive dynamic subcategory type filters from backend products
+  const dynamicSubcategoryFilters = useMemo(() => {
+    const map = {};
+    hardwareItems.forEach(item => {
+      if (!item.subcategory) return;
+      const typeVal = item.printerType || item.classification || null;
+      if (typeVal) {
+        if (!map[item.subcategory]) map[item.subcategory] = new Set();
+        map[item.subcategory].add(typeVal);
+      }
+    });
+    const result = {};
+    Object.entries(map).forEach(([cat, set]) => {
+      result[cat] = Array.from(set);
+    });
+    return result;
+  }, [hardwareItems]);
+
+  // Get current filter types: prefer dynamic from backend, fall back to static defaults
+  const currentSubcategoryFilters = useMemo(() => {
+    if (activeCategory === 'all') {
+      // Combine all dynamic types across all categories
+      const allTypes = new Set();
+      Object.values(dynamicSubcategoryFilters).forEach(arr => arr.forEach(v => allTypes.add(v)));
+      if (allTypes.size > 0) return Array.from(allTypes);
+      return Array.from(new Set(Object.values(subcategoryFiltersDefault).flat()));
+    }
+    const dynamic = dynamicSubcategoryFilters[activeCategory];
+    return dynamic && dynamic.length > 0 ? dynamic : (subcategoryFiltersDefault[activeCategory] || []);
+  }, [activeCategory, dynamicSubcategoryFilters]);
+
   const filteredItems = useMemo(() => {
     let items = hardwareItems.filter(item => {
       const matchesCat = activeCategory === 'all' || item.subcategory === activeCategory;
@@ -511,8 +835,14 @@ export default function HardwareProductPage() {
       const matchesSearch = !sq || item.title.toLowerCase().includes(sq) || item.description.toLowerCase().includes(sq) || (item.brand || '').toLowerCase().includes(sq);
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(item.brand || 'Cryptware');
 
-      const itemText = (item.title + ' ' + item.description + ' ' + (item.models || []).join(' ')).toLowerCase();
-      const matchesSubtype = selectedSubtypes.length === 0 || selectedSubtypes.some(s => itemText.includes(s.toLowerCase()));
+      // Match subtypes against DB fields (printerType, classification) first, then text fallback
+      const matchesSubtype = selectedSubtypes.length === 0 || selectedSubtypes.some(s => {
+        const itemTypeVal = (item.printerType || item.classification || '').toLowerCase();
+        if (itemTypeVal && itemTypeVal === s.toLowerCase()) return true;
+        // Text fallback for legacy/partial matches
+        const itemText = (item.title + ' ' + item.description + ' ' + (item.models || []).join(' ')).toLowerCase();
+        return itemText.includes(s.toLowerCase());
+      });
 
       const categoryIndustries = hardwareCategories.find(c => c.id === item.subcategory)?.industries || [];
       const matchesIndustry = selectedIndustries.length === 0 || selectedIndustries.some(ind => categoryIndustries.includes(ind));
@@ -578,6 +908,7 @@ export default function HardwareProductPage() {
             {sidebarCategories.map(cat => {
               const isChecked = activeCategory === cat.id;
               const color = categoryColors[cat.id] || '#06a3da';
+              const count = countsByCategory[cat.id] || 0;
               return (
                 <label
                   key={cat.id}
@@ -585,15 +916,20 @@ export default function HardwareProductPage() {
                     handleCategoryChange(cat.id);
                     if (onClose) onClose();
                   }}
-                  className="flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group"
+                  className="flex items-center justify-between gap-2.5 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group"
                 >
-                  <div
-                    className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${isChecked ? 'border-transparent' : 'border-gray-300 group-hover:border-gray-400'}`}
-                    style={isChecked ? { background: color, borderColor: color } : {}}
-                  >
-                    {isChecked && <Icon.Check c="w-2.5 h-2.5 text-white" />}
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${isChecked ? 'border-transparent' : 'border-gray-300 group-hover:border-gray-400'}`}
+                      style={isChecked ? { background: color, borderColor: color } : {}}
+                    >
+                      {isChecked && <Icon.Check c="w-2.5 h-2.5 text-white" />}
+                    </div>
+                    <span className="text-xs font-semibold" style={isChecked ? { color } : { color: '#374151' }}>{cat.label}</span>
                   </div>
-                  <span className="text-xs font-semibold" style={isChecked ? { color } : { color: '#374151' }}>{cat.label}</span>
+                  {count > 0 && (
+                    <span className="text-[0.6rem] text-[#94a3b8] font-bold bg-[#f1f5f9] px-1.5 py-0.5 rounded-full">{count}</span>
+                  )}
                 </label>
               );
             })}
@@ -602,28 +938,29 @@ export default function HardwareProductPage() {
 
         <SidebarSection title="Filter by Type">
           <div className="space-y-0.5 max-h-[250px] overflow-y-auto pr-0.5">
-            {(activeCategory === 'all'
-              ? Array.from(new Set(Object.values(subcategoryFilters).flat()))
-              : (subcategoryFilters[activeCategory] || [])
-            ).map((s, idx) => {
-              const isChecked = selectedSubtypes.includes(s);
-              const color = categoryColors[activeCategory] || '#06a3da';
-              return (
-                <label
-                  key={`${s}-${idx}`}
-                  onClick={() => toggleSubtype(s)}
-                  className="flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group"
-                >
-                  <div
-                    className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${isChecked ? 'border-transparent' : 'border-gray-300 group-hover:border-gray-400'}`}
-                    style={isChecked ? { background: color, borderColor: color } : {}}
+            {currentSubcategoryFilters.length === 0 ? (
+              <p className="text-xs text-[#94a3b8] py-2 italic">No types available</p>
+            ) : (
+              currentSubcategoryFilters.map((s, idx) => {
+                const isChecked = selectedSubtypes.includes(s);
+                const color = categoryColors[activeCategory] || '#06a3da';
+                return (
+                  <label
+                    key={`${s}-${idx}`}
+                    onClick={() => toggleSubtype(s)}
+                    className="flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-pointer hover:bg-[#f8faff] transition-colors group"
                   >
-                    {isChecked && <Icon.Check c="w-2.5 h-2.5 text-white" />}
-                  </div>
-                  <span className="text-xs font-semibold" style={isChecked ? { color } : { color: '#374151' }}>{s}</span>
-                </label>
-              );
-            })}
+                    <div
+                      className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${isChecked ? 'border-transparent' : 'border-gray-300 group-hover:border-gray-400'}`}
+                      style={isChecked ? { background: color, borderColor: color } : {}}
+                    >
+                      {isChecked && <Icon.Check c="w-2.5 h-2.5 text-white" />}
+                    </div>
+                    <span className="text-xs font-semibold" style={isChecked ? { color } : { color: '#374151' }}>{s}</span>
+                  </label>
+                );
+              })
+            )}
           </div>
         </SidebarSection>
 
@@ -678,7 +1015,7 @@ export default function HardwareProductPage() {
             </div>
           </div>
           <Link
-            to="/#contact-us"
+            to="/hardware#contact-us"
             onClick={() => onClose?.()}
             className="block w-full py-2.5 bg-white/15 hover:bg-white/25 border border-white/20 rounded-xl text-center text-xs font-bold uppercase tracking-wider transition-all duration-200"
           >
@@ -700,9 +1037,7 @@ export default function HardwareProductPage() {
         <div className="w-[92%] max-w-[1280px] mx-auto py-10">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs text-white/35 mb-6">
-            <Link to="/" className="hover:text-white transition-colors">Home</Link>
-            <span>/</span>
-            <Link to="/hardware" className="hover:text-white transition-colors">Hardware</Link>
+            <Link to="/hardware" className="hover:text-white transition-colors">Home</Link>
             <span>/</span>
             <span className="text-white/65">Products</span>
           </div>
@@ -891,7 +1226,7 @@ export default function HardwareProductPage() {
                   <>
                     <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5' : 'flex flex-col gap-3'}>
                       {displayedItems.map((item, idx) => (
-                        <ProductCard key={item.id} item={item} index={idx} onOpen={setSelectedItem} viewMode={viewMode} />
+                        <ProductCard key={item.id} item={item} index={idx} onOpen={setSelectedItem} onLabelQuote={setLabelQuoteItem} viewMode={viewMode} />
                       ))}
                     </div>
 
@@ -982,6 +1317,10 @@ export default function HardwareProductPage() {
           </div>
         </div>,
         document.body
+      )}
+
+      {labelQuoteItem && (
+        <LabelQuoteModal item={labelQuoteItem} onClose={() => setLabelQuoteItem(null)} />
       )}
 
       <Footer />

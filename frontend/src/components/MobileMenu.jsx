@@ -25,26 +25,35 @@ export default function MobileMenu({ isOpen, onClose, variant = 'main' }) {
   const links = MENU_CONFIGS[variant] || MENU_CONFIGS.main;
   const isHardware = variant === 'hardware';
 
-  const handleMainLinkClick = (e, targetId) => {
-    e.preventDefault();
-    onClose();
+  const handleLinkClick = (e, href) => {
+    if (!href.includes('#')) {
+      onClose();
+      return;
+    }
 
-    setTimeout(() => {
-      const target = document.querySelector(targetId);
-      if (!target) return;
+    const [path, hash] = href.split('#');
+    const targetId = '#' + hash;
+    const linkPath = path || '/';
 
-      const targetY = target.getBoundingClientRect().top + window.scrollY - 72;
-      gsap.to(window, {
-        duration: 0.8,
-        scrollTo: { y: targetY },
-        ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-        overwrite: 'auto',
-      });
-    }, 300);
-  };
-
-  const handleHardwareClick = () => {
-    onClose();
+    if (window.location.pathname === linkPath || (window.location.pathname === '/' && linkPath === '')) {
+      e.preventDefault();
+      onClose();
+      setTimeout(() => {
+        const target = document.querySelector(targetId);
+        if (target) {
+          const targetY = target.getBoundingClientRect().top + window.scrollY - 72;
+          gsap.to(window, {
+            duration: 0.8,
+            scrollTo: { y: targetY },
+            ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+            overwrite: 'auto',
+          });
+          window.history.pushState(null, null, targetId);
+        }
+      }, 300);
+    } else {
+      onClose();
+    }
   };
 
   return (
@@ -73,7 +82,7 @@ export default function MobileMenu({ isOpen, onClose, variant = 'main' }) {
             <a
               key={link.label}
               href={link.href}
-              onClick={variant === 'main' ? (e) => handleMainLinkClick(e, link.href) : handleHardwareClick}
+              onClick={(e) => handleLinkClick(e, link.href)}
               className={`${link.cta ? (isHardware ? 'text-[#06a3da] font-semibold hover:underline flex items-center gap-2 mt-4 uppercase tracking-wider' : 'text-brand font-medium hover:underline flex items-center gap-2 mt-4 font-sans text-lg uppercase tracking-wider') : (isHardware ? 'text-white hover:text-[#06a3da] transition-colors' : 'text-ink hover:text-brand transition-colors')}`}
             >
               {link.label}

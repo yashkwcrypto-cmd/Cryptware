@@ -84,6 +84,10 @@ export default function AdminDashboard() {
           useCases: parseArrayField(formData.useCases),
           documents: parseArrayField(formData.documents),
         };
+        // Do not send base64 string back to server if image wasn't changed
+        if (typeof payload.img === 'string') {
+          delete payload.img;
+        }
       }
 
       if (editingId) {
@@ -184,211 +188,300 @@ export default function AdminDashboard() {
       <div className="max-w-[1280px] mx-auto pt-32 pb-20 px-6">
         <h1 className="text-4xl font-serif mb-8 text-brand">Admin Dashboard</h1>
         
-        {error && <div className="bg-red-100 text-red-700 p-4 rounded mb-6">{error}</div>}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm mb-8 flex items-center gap-3">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span className="font-medium">{error}</span>
+          </div>
+        )}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-paper-3 p-8 mb-12 transition-all hover:shadow-md">
-          <h2 className="text-2xl font-serif mb-6 flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center text-sm font-bold">
-              {editingId ? '✎' : '+'}
+        <div className="mb-12">
+          <h2 className="text-3xl font-serif mb-8 flex items-center gap-4 text-ink">
+            <span className="w-12 h-12 rounded-xl bg-white border border-paper-3 text-brand flex items-center justify-center shadow-sm">
+              {editingId ? (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+              )}
             </span>
             {editingId ? 'Edit Product' : 'Add New Product'}
           </h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <form onSubmit={handleSubmit} className="space-y-6">
             
-            <div className="col-span-1 md:col-span-2 lg:col-span-1">
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">ID (Required)</label>
-              <input required name="id" value={formData.id} onChange={handleChange} disabled={!!editingId} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" placeholder="e.g. tsc-te-244" />
-            </div>
-            
-            <div className="col-span-1 md:col-span-2">
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Title (Required)</label>
-              <input required name="title" value={formData.title} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Type</label>
-              <select name="type" value={formData.type} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all bg-white">
-                <option value="hardware">Hardware</option>
-                <option value="software">Software</option>
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Category</label>
-              <input required name="category" value={formData.category} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Subcategory</label>
-              <input required name="subcategory" value={formData.subcategory} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Brand</label>
-              <input name="brand" value={formData.brand} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Printer Type / Sub-brand</label>
-              <input name="printerType" value={formData.printerType} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Classification</label>
-              <input name="classification" value={formData.classification} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" />
-            </div>
-
-            <div className="col-span-1 md:col-span-2 lg:col-span-3">
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Image</label>
-              {typeof formData.img === 'string' && formData.img && (
-                <div className="mb-4">
-                  <img src={formData.img} alt="Current product" className="w-32 h-32 object-contain bg-paper-2 rounded-lg border border-paper-3 shadow-sm" />
-                  <p className="text-sm text-ink-3 mt-2">Current image (Upload new to replace)</p>
+            {/* General Info Card */}
+            <div className="bg-white rounded-2xl shadow-sm border border-paper-3 p-8 hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-bold mb-6 text-brand border-b border-paper-3 pb-3 uppercase tracking-wider">General Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="col-span-1 md:col-span-2 lg:col-span-1 group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 group-focus-within:text-brand transition-colors">ID (Required)</label>
+                  <input required name="id" value={formData.id} onChange={handleChange} disabled={!!editingId} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner disabled:opacity-60 disabled:cursor-not-allowed" placeholder="e.g. tsc-te-244" />
                 </div>
-              )}
-              <input type="file" accept="image/*" name="img" onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all bg-paper-2/50 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-brand/10 file:text-brand hover:file:bg-brand/20" />
+                
+                <div className="col-span-1 md:col-span-2 group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 group-focus-within:text-brand transition-colors">Title (Required)</label>
+                  <input required name="title" value={formData.title} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner" placeholder="e.g. Zebra ZT411 Industrial Printer" />
+                </div>
+
+                <div className="group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 group-focus-within:text-brand transition-colors">Type</label>
+                  <select name="type" value={formData.type} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner font-medium">
+                    <option value="hardware">Hardware</option>
+                    <option value="software">Software</option>
+                  </select>
+                </div>
+                
+                <div className="group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 group-focus-within:text-brand transition-colors">Category</label>
+                  <input required name="category" value={formData.category} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner" placeholder="e.g. products" />
+                </div>
+
+                <div className="group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 group-focus-within:text-brand transition-colors">Subcategory</label>
+                  <input required name="subcategory" value={formData.subcategory} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner" placeholder="e.g. barcode-printers" />
+                </div>
+
+                <div className="group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 group-focus-within:text-brand transition-colors">Brand</label>
+                  <input name="brand" value={formData.brand} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner" placeholder="e.g. Zebra" />
+                </div>
+              </div>
             </div>
 
-            <div className="col-span-1 md:col-span-2 lg:col-span-3">
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Description</label>
-              <textarea required name="description" value={formData.description} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" rows="3"></textarea>
+            {/* Specifications Card */}
+            <div className="bg-white rounded-2xl shadow-sm border border-paper-3 p-8 hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-bold mb-6 text-brand border-b border-paper-3 pb-3 uppercase tracking-wider">Detailed Specifications</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 group-focus-within:text-brand transition-colors">Printer Type / Sub-brand</label>
+                  <input name="printerType" value={formData.printerType} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner" placeholder="e.g. Industrial Printers" />
+                </div>
+
+                <div className="group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 group-focus-within:text-brand transition-colors">Classification</label>
+                  <input name="classification" value={formData.classification} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner" placeholder="e.g. Premium" />
+                </div>
+                
+                <div className="hidden lg:block"></div>
+
+                <div className="col-span-1 lg:col-span-1 group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 flex items-center justify-between group-focus-within:text-brand transition-colors">
+                    <span>Specs</span>
+                    <span className="text-[10px] text-ink-3/50 font-normal normal-case border border-paper-3 rounded px-1.5 py-0.5">Line Separated</span>
+                  </label>
+                  <textarea name="specs" value={formData.specs} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner font-mono text-sm leading-relaxed" rows="5" placeholder="Print width: 4.09 in&#10;Resolution: 203 dpi"></textarea>
+                </div>
+
+                <div className="col-span-1 lg:col-span-1 group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 flex items-center justify-between group-focus-within:text-brand transition-colors">
+                    <span>Models</span>
+                    <span className="text-[10px] text-ink-3/50 font-normal normal-case border border-paper-3 rounded px-1.5 py-0.5">Line Separated</span>
+                  </label>
+                  <textarea name="models" value={formData.models} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner font-mono text-sm leading-relaxed" rows="5" placeholder="ZT41142-T010000Z&#10;ZT41143-T010000Z"></textarea>
+                </div>
+
+                <div className="col-span-1 lg:col-span-1 group">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 flex items-center justify-between group-focus-within:text-brand transition-colors">
+                    <span>Use Cases</span>
+                    <span className="text-[10px] text-ink-3/50 font-normal normal-case border border-paper-3 rounded px-1.5 py-0.5">Line Separated</span>
+                  </label>
+                  <textarea name="useCases" value={formData.useCases} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner font-mono text-sm leading-relaxed" rows="5" placeholder="Manufacturing&#10;Transportation & Logistics"></textarea>
+                </div>
+              </div>
             </div>
 
-            <div className="col-span-1 md:col-span-2 lg:col-span-3">
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Official URL</label>
-              <input name="officialUrl" value={formData.officialUrl} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" />
-            </div>
+            {/* Media & Links Card */}
+            <div className="bg-white rounded-2xl shadow-sm border border-paper-3 p-8 hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-bold mb-6 text-brand border-b border-paper-3 pb-3 uppercase tracking-wider">Media & Content</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <div className="col-span-1 flex flex-col gap-6">
+                  <div className="group">
+                    <label className="block text-xs font-bold uppercase text-ink-3 mb-2 group-focus-within:text-brand transition-colors">Product Image</label>
+                    <div className="bg-paper/50 border-2 border-dashed border-paper-3 rounded-xl p-6 flex flex-col items-center justify-center relative hover:border-brand/50 hover:bg-brand/5 transition-all group-focus-within:border-brand">
+                      {formData.img ? (
+                        <div className="flex flex-col items-center z-10 pointer-events-none">
+                          <img src={typeof formData.img === 'string' ? formData.img : URL.createObjectURL(formData.img)} alt="Product preview" className="w-32 h-32 object-contain bg-white rounded-xl shadow-sm mb-4" />
+                          <p className="text-xs text-ink-3 font-medium bg-white px-3 py-1 rounded-full shadow-sm border border-paper-3 truncate max-w-[200px]">
+                            {typeof formData.img === 'string' ? 'Click to replace' : formData.img.name}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center text-ink-3 z-10 pointer-events-none">
+                          <svg className="w-10 h-10 mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                          <p className="text-sm font-medium">Drag & drop or click to upload</p>
+                        </div>
+                      )}
+                      <input type="file" accept="image/*" name="img" onChange={handleChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                    </div>
+                  </div>
 
-            <div className="col-span-1 lg:col-span-1">
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Specs (JSON array or Line Separated)</label>
-              <textarea name="specs" value={formData.specs} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all font-mono text-sm" rows="4"></textarea>
-            </div>
-
-            <div className="col-span-1 lg:col-span-1">
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Models (JSON array or Line Separated)</label>
-              <textarea name="models" value={formData.models} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all font-mono text-sm" rows="4"></textarea>
-            </div>
-
-            <div className="col-span-1 lg:col-span-1">
-              <label className="block text-sm font-bold uppercase text-ink-3 mb-2">Use Cases (JSON array or Line Separated)</label>
-              <textarea name="useCases" value={formData.useCases} onChange={handleChange} className="w-full border border-paper-3 rounded-lg p-3 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all font-mono text-sm" rows="4"></textarea>
-            </div>
-
-            <div className="col-span-1 md:col-span-2 lg:col-span-3 flex items-center gap-8 py-4 px-6 bg-paper-2/50 rounded-xl border border-paper-3">
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <div className="relative flex items-center">
-                  <input type="checkbox" name="featured" checked={formData.featured} onChange={handleChange} className="peer w-6 h-6 opacity-0 absolute cursor-pointer" />
-                  <div className="w-6 h-6 border-2 border-brand rounded flex items-center justify-center peer-checked:bg-brand transition-colors">
-                    <svg className="w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"/></svg>
+                  <div className="group">
+                    <label className="block text-xs font-bold uppercase text-ink-3 mb-2 flex items-center justify-between group-focus-within:text-brand transition-colors">
+                      <span>Official URL</span>
+                      <svg className="w-4 h-4 text-ink-3/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                    </label>
+                    <input name="officialUrl" value={formData.officialUrl} onChange={handleChange} className="w-full bg-paper/50 border border-paper-3 rounded-xl p-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner" placeholder="https://example.com/product" />
                   </div>
                 </div>
-                <span className="font-bold uppercase text-ink-3 group-hover:text-ink transition-colors">Featured</span>
-              </label>
-              
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <div className="relative flex items-center">
-                  <input type="checkbox" name="isActive" checked={formData.isActive} onChange={handleChange} className="peer w-6 h-6 opacity-0 absolute cursor-pointer" />
-                  <div className="w-6 h-6 border-2 border-brand rounded flex items-center justify-center peer-checked:bg-brand transition-colors">
-                    <svg className="w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"/></svg>
-                  </div>
+
+                <div className="col-span-1 group flex flex-col">
+                  <label className="block text-xs font-bold uppercase text-ink-3 mb-2 group-focus-within:text-brand transition-colors">Description</label>
+                  <textarea required name="description" value={formData.description} onChange={handleChange} className="w-full h-full min-h-[200px] bg-paper/50 border border-paper-3 rounded-xl p-4 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner resize-none leading-relaxed" placeholder="Enter a detailed product description..."></textarea>
                 </div>
-                <span className="font-bold uppercase text-ink-3 group-hover:text-ink transition-colors">Is Active</span>
-              </label>
+              </div>
             </div>
 
-            <div className="col-span-1 md:col-span-2 lg:col-span-3 flex gap-4 mt-2">
-              <button type="submit" className="bg-brand text-white px-8 py-3.5 rounded-xl font-bold hover:bg-brand-h transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center gap-2">
-                {editingId ? 'Save Changes' : 'Create Product'}
-              </button>
-              {editingId && (
-                <button type="button" onClick={() => { setEditingId(null); setFormData(defaultForm); }} className="bg-paper-2 text-ink border border-paper-3 px-8 py-3.5 rounded-xl font-bold hover:bg-paper-3 transition-all active:scale-95">
-                  Cancel Edit
+            {/* Status & Submit Card */}
+            <div className="bg-white rounded-2xl shadow-sm border border-paper-3 p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 sticky bottom-6 z-10">
+              <div className="flex items-center gap-8">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div className="relative">
+                    <input type="checkbox" name="featured" checked={formData.featured} onChange={handleChange} className="peer sr-only" />
+                    <div className="w-11 h-6 bg-paper-3 rounded-full peer peer-focus:ring-4 peer-focus:ring-brand/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
+                  </div>
+                  <span className="font-bold text-sm text-ink-3 uppercase tracking-wider group-hover:text-ink transition-colors">Featured</span>
+                </label>
+                
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div className="relative">
+                    <input type="checkbox" name="isActive" checked={formData.isActive} onChange={handleChange} className="peer sr-only" />
+                    <div className="w-11 h-6 bg-paper-3 rounded-full peer peer-focus:ring-4 peer-focus:ring-brand/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
+                  </div>
+                  <span className="font-bold text-sm text-ink-3 uppercase tracking-wider group-hover:text-ink transition-colors">Active Status</span>
+                </label>
+              </div>
+
+              <div className="flex gap-4 w-full sm:w-auto">
+                {editingId && (
+                  <button type="button" onClick={() => { setEditingId(null); setFormData(defaultForm); }} className="flex-1 sm:flex-none bg-white text-ink border-2 border-paper-3 px-6 py-3 rounded-xl font-bold hover:bg-paper-2 hover:border-ink-3 transition-all active:scale-95 text-sm uppercase tracking-wider">
+                    Cancel
+                  </button>
+                )}
+                <button type="submit" className="flex-1 sm:flex-none bg-brand text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-h transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:translate-y-0 flex items-center justify-center gap-2 text-sm uppercase tracking-wider">
+                  {editingId ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+                      Save Changes
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                      Create Product
+                    </>
+                  )}
                 </button>
-              )}
+              </div>
             </div>
           </form>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-paper-3 p-8">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
-            <h2 className="text-2xl font-serif flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center text-sm">
-                ☰
-              </span>
-              Product Inventory
-            </h2>
-            
-            <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-              <div className="relative w-full sm:w-64">
-                <input 
-                  type="text" 
-                  placeholder="Search ID or Title..." 
-                  value={searchTerm} 
-                  onChange={(e) => setSearchTerm(e.target.value)} 
-                  className="w-full border border-paper-3 rounded-xl py-2.5 pl-10 pr-4 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all bg-paper-2/30"
-                />
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3">🔍</span>
+        {/* Inventory Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-paper-3 overflow-hidden">
+          <div className="p-8 border-b border-paper-3">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+              <div className="flex flex-col gap-1">
+                <h2 className="text-2xl font-serif flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-paper-2 border border-paper-3 text-ink-3 flex items-center justify-center shadow-sm">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                  </span>
+                  Product Inventory
+                </h2>
+                <p className="text-sm text-ink-3 font-medium">Manage and organize your product catalog</p>
               </div>
-              <select 
-                value={filterType} 
-                onChange={(e) => setFilterType(e.target.value)}
-                className="border border-paper-3 rounded-xl py-2.5 px-4 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all bg-paper-2/30 font-bold text-ink-3 uppercase text-xs"
-              >
-                <option value="">All Types</option>
-                <option value="hardware">Hardware</option>
-                <option value="software">Software</option>
-              </select>
+              
+              <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <div className="relative w-full sm:w-72">
+                  <input 
+                    type="text" 
+                    placeholder="Search by ID or Title..." 
+                    value={searchTerm} 
+                    onChange={(e) => setSearchTerm(e.target.value)} 
+                    className="w-full bg-paper/50 border border-paper-3 rounded-xl py-2.5 pl-11 pr-4 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner text-sm font-medium"
+                  />
+                  <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-ink-3/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </div>
+                <div className="relative">
+                  <select 
+                    value={filterType} 
+                    onChange={(e) => setFilterType(e.target.value)}
+                    className="w-full sm:w-auto appearance-none bg-paper/50 border border-paper-3 rounded-xl py-2.5 pl-4 pr-10 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all shadow-inner font-bold text-ink-3 uppercase text-xs tracking-wider"
+                  >
+                    <option value="">All Types</option>
+                    <option value="hardware">Hardware</option>
+                    <option value="software">Software</option>
+                  </select>
+                  <svg className="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
             </div>
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
+            <div className="flex flex-col items-center justify-center py-32 bg-paper/30">
+              <div className="w-10 h-10 border-4 border-brand/30 border-t-brand rounded-full animate-spin mb-4"></div>
+              <p className="text-ink-3 font-bold uppercase tracking-widest text-sm animate-pulse">Loading Inventory...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-paper-3">
-              <table className="w-full text-left border-collapse min-w-[800px]">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[900px]">
                 <thead>
-                  <tr className="border-b border-paper-3 bg-paper-2/80">
-                    <th onClick={() => requestSort('id')} className="p-4 text-xs tracking-wider uppercase font-bold text-ink-3 cursor-pointer hover:bg-paper-3/50 transition-colors select-none">
-                      ID <SortIcon column="id" />
+                  <tr className="bg-paper-2/80 border-b border-paper-3">
+                    <th onClick={() => requestSort('id')} className="p-4 px-6 text-xs tracking-widest uppercase font-bold text-ink-3 cursor-pointer hover:bg-paper-3/50 transition-colors select-none group">
+                      <div className="flex items-center gap-1">ID <SortIcon column="id" /></div>
                     </th>
-                    <th className="p-4 text-xs tracking-wider uppercase font-bold text-ink-3">Image</th>
-                    <th onClick={() => requestSort('title')} className="p-4 text-xs tracking-wider uppercase font-bold text-ink-3 cursor-pointer hover:bg-paper-3/50 transition-colors select-none">
-                      Title <SortIcon column="title" />
+                    <th className="p-4 px-6 text-xs tracking-widest uppercase font-bold text-ink-3">Image</th>
+                    <th onClick={() => requestSort('title')} className="p-4 px-6 text-xs tracking-widest uppercase font-bold text-ink-3 cursor-pointer hover:bg-paper-3/50 transition-colors select-none">
+                      <div className="flex items-center gap-1">Product Details <SortIcon column="title" /></div>
                     </th>
-                    <th onClick={() => requestSort('type')} className="p-4 text-xs tracking-wider uppercase font-bold text-ink-3 cursor-pointer hover:bg-paper-3/50 transition-colors select-none">
-                      Type <SortIcon column="type" />
+                    <th onClick={() => requestSort('type')} className="p-4 px-6 text-xs tracking-widest uppercase font-bold text-ink-3 cursor-pointer hover:bg-paper-3/50 transition-colors select-none">
+                      <div className="flex items-center gap-1">Type <SortIcon column="type" /></div>
                     </th>
-                    <th onClick={() => requestSort('subcategory')} className="p-4 text-xs tracking-wider uppercase font-bold text-ink-3 cursor-pointer hover:bg-paper-3/50 transition-colors select-none">
-                      Subcategory <SortIcon column="subcategory" />
+                    <th onClick={() => requestSort('subcategory')} className="p-4 px-6 text-xs tracking-widest uppercase font-bold text-ink-3 cursor-pointer hover:bg-paper-3/50 transition-colors select-none">
+                      <div className="flex items-center gap-1">Subcategory <SortIcon column="subcategory" /></div>
                     </th>
-                    <th className="p-4 text-xs tracking-wider uppercase font-bold text-ink-3 text-right">Actions</th>
+                    <th className="p-4 px-6 text-xs tracking-widest uppercase font-bold text-ink-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-paper-3 bg-white">
                   {filteredAndSortedProducts.map(p => (
-                    <tr key={p.id} className="border-b border-paper-3 hover:bg-brand/5 transition-colors group">
-                      <td className="p-4 text-sm text-ink-3 font-mono">{p.id}</td>
-                      <td className="p-4">
+                    <tr key={p.id} className="hover:bg-brand/5 transition-colors group">
+                      <td className="p-4 px-6 text-sm text-ink-3 font-mono font-medium">{p.id}</td>
+                      <td className="p-4 px-6">
                         {p.img ? (
-                          <img src={p.img} alt={p.title} className="w-12 h-12 object-contain bg-white rounded-lg border border-paper-3 shadow-sm group-hover:scale-110 transition-transform" />
+                          <div className="w-14 h-14 bg-white rounded-xl border border-paper-3 shadow-sm p-1.5 group-hover:shadow-md transition-all group-hover:scale-105">
+                            <img src={p.img} alt={p.title} className="w-full h-full object-contain" />
+                          </div>
                         ) : (
-                          <div className="w-12 h-12 bg-paper-2 rounded-lg border border-paper-3 flex items-center justify-center text-[10px] text-ink-3 uppercase font-bold">No img</div>
+                          <div className="w-14 h-14 bg-paper-2 rounded-xl border border-dashed border-paper-3 flex flex-col items-center justify-center text-[8px] text-ink-3 uppercase font-bold">
+                            <svg className="w-4 h-4 mb-0.5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            None
+                          </div>
                         )}
                       </td>
-                      <td className="p-4 font-bold text-ink">{p.title}</td>
-                      <td className="p-4">
-                        <span className="bg-paper-2 border border-paper-3 px-2.5 py-1 rounded-full text-[10px] font-bold text-ink-3 uppercase tracking-widest">{p.type}</span>
+                      <td className="p-4 px-6">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-ink text-base mb-1">{p.title}</span>
+                          <span className="text-xs text-ink-3 font-medium bg-paper-2 w-fit px-2 py-0.5 rounded border border-paper-3">{p.brand || 'No Brand'}</span>
+                        </div>
                       </td>
-                      <td className="p-4 text-sm text-ink-3 uppercase font-semibold">{p.subcategory}</td>
-                      <td className="p-4">
-                        <div className="flex gap-3 justify-end items-center">
-                          <button onClick={() => handleEdit(p)} className="text-brand font-bold text-sm uppercase hover:underline flex items-center gap-1">
-                            ✎ Edit
+                      <td className="p-4 px-6">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${p.type === 'hardware' ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-purple-50 text-purple-600 border-purple-200'}`}>
+                          {p.type}
+                        </span>
+                      </td>
+                      <td className="p-4 px-6">
+                        <span className="text-xs text-ink-3 font-bold bg-paper-2 px-3 py-1.5 rounded-lg border border-paper-3 uppercase tracking-wider">{p.subcategory}</span>
+                      </td>
+                      <td className="p-4 px-6">
+                        <div className="flex gap-2 justify-end items-center">
+                          <button onClick={() => handleEdit(p)} className="p-2 text-brand hover:bg-brand/10 rounded-lg transition-colors group/btn relative" aria-label="Edit">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-ink text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">Edit</span>
                           </button>
-                          <button onClick={() => handleDelete(p.id)} className="text-red-500/70 hover:text-red-600 font-bold text-sm uppercase hover:underline transition-colors flex items-center gap-1">
-                            × Delete
+                          <button onClick={() => handleDelete(p.id)} className="p-2 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors group/btn relative" aria-label="Delete">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-ink text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">Delete</span>
                           </button>
                         </div>
                       </td>
@@ -396,9 +489,12 @@ export default function AdminDashboard() {
                   ))}
                   {filteredAndSortedProducts.length === 0 && (
                     <tr>
-                      <td colSpan="6" className="p-16 text-center">
-                        <p className="text-ink-3 font-bold text-lg mb-2">No products found</p>
-                        <p className="text-ink-3/70 text-sm">Try adjusting your search or filter settings.</p>
+                      <td colSpan="6" className="py-20 text-center bg-paper/30">
+                        <div className="flex flex-col items-center justify-center text-ink-3">
+                          <svg className="w-16 h-16 mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                          <p className="font-bold text-xl mb-1 text-ink-2">No products found</p>
+                          <p className="text-sm">Try adjusting your search or filter settings.</p>
+                        </div>
                       </td>
                     </tr>
                   )}

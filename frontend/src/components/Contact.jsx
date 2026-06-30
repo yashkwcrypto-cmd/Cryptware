@@ -5,10 +5,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 // ─── Send Message Modal — form only, white background ────────────────────────
-function SendMessageModal({ onClose }) {
+function SendMessageModal({ initialMessage = '', onClose }) {
   const overlayRef = useRef(null);
   const cardRef = useRef(null);
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', message: initialMessage });
   const [submitted, setSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState(null);
@@ -197,7 +197,7 @@ export default function Contact({ initialMessage }) {
   const [showFormModal, setShowFormModal] = useState(false);
 
   useEffect(() => {
-    if (initialMessage) setShowFormModal(true);
+    if (initialMessage && initialMessage.ts) setShowFormModal(true);
   }, [initialMessage]);
 
   useEffect(() => {
@@ -216,7 +216,7 @@ export default function Contact({ initialMessage }) {
 
   return (
     <>
-      {showFormModal && <SendMessageModal onClose={() => setShowFormModal(false)} />}
+      {showFormModal && <SendMessageModal initialMessage={initialMessage?.text || ''} onClose={() => setShowFormModal(false)} />}
 
       <section
         ref={sectionRef}
@@ -328,7 +328,7 @@ export default function Contact({ initialMessage }) {
                 <div className="absolute inset-0 ring-1 ring-inset ring-white/[0.05] rounded-2xl z-10 pointer-events-none" />
                 <iframe
                   title="Cryptware Infotech Solutions LLP Location"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3671.9065889478!2d72.51957315!3d23.02838958!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e858c6620f8d9%3A0x66940b9e69da7d1e!2sTitanium%20City%20Centre%2C%20Prahlad%20Nagar%2C%20Ahmedabad%2C%20Gujarat%20380015!5e0!3m2!1sen!2sin!4v1749384000000!5m2!1sen!2sin"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3672.383787747805!2d72.524586!3d23.0117152!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e84d61cb3ffff%3A0x34ce3dbee3154290!2sCryptware%20Infotech!5e0!3m2!1sen!2sin!4v1719299475143!5m2!1sen!2sin"
                   className="w-full h-full border-0 grayscale opacity-75"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"

@@ -38,7 +38,7 @@ try {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   }));
   app.use(express.json());
-  
+
   // Serve uploads directory statically
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

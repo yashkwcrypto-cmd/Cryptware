@@ -193,8 +193,13 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
   // ── Filtered items (hardware now includes brand filter) ───────────────────
   const filteredItems = useMemo(() => {
     // Merge DB products with static catalog data, preferring DB updates
-    const allProducts = [...catalogData, ...dbSoftwareProducts];
-    const uniqueSource = Array.from(new Map(allProducts.map(item => [item.id, item])).values());
+    const productMap = new Map();
+    catalogData.forEach(item => productMap.set(item.id, item));
+    dbSoftwareProducts.forEach(dbItem => {
+      const existing = productMap.get(dbItem.id);
+      productMap.set(dbItem.id, existing ? { ...existing, ...dbItem } : dbItem);
+    });
+    const uniqueSource = Array.from(productMap.values());
 
     if (cat === 'software') {
       return uniqueSource.filter(item => {
@@ -885,7 +890,7 @@ export default function Catalog({ activeCategory, setActiveCategory, onQuoteRequ
                 <span className="w-10 h-10 rounded-xl bg-brand-light flex items-center justify-center flex-shrink-0 text-brand text-xl">🛡️</span>
                 <div>
                   <h5 className="text-[0.85rem] font-bold text-ink mb-1">Cryptware Assurance</h5>
-                  <p className="text-[0.8rem] text-ink-3 leading-relaxed">All custom deployments, hardware provisioning, and system integrations come with certified professional warranties, 10/5 support, and dedicated rollout training.</p>
+                  <p className="text-[0.8rem] text-ink-3 leading-relaxed">All custom deployments, hardware provisioning, and system integrations come with certified professional warranties, 24/7 support, and dedicated rollout training.</p>
                 </div>
               </div>
 

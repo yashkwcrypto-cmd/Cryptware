@@ -95,19 +95,45 @@ export default function Navbar({ onMenuToggle, isMenuOpen, variant = 'main' }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [location.pathname, variant]);
 
-  const handleMainLinkClick = (e, targetId) => {
-    e.preventDefault();
-    const target = document.querySelector(targetId);
-    if (!target) return;
+  useEffect(() => {
+    if (location.hash) {
+      setTimeout(() => {
+        const target = document.querySelector(location.hash);
+        if (target) {
+          const targetY = target.getBoundingClientRect().top + window.scrollY - 72;
+          gsap.to(window, {
+            duration: 0.8,
+            scrollTo: { y: targetY },
+            ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+            overwrite: 'auto',
+          });
+        }
+      }, 300);
+    }
+  }, [location.pathname, location.hash]);
 
-    const targetY = target.getBoundingClientRect().top + window.scrollY - 72;
-    gsap.to(window, {
-      duration: 0.8,
-      scrollTo: { y: targetY },
-      ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-      overwrite: 'auto',
-    });
-    setActiveSection(targetId.replace(/^#/, ''));
+  const handleLinkClick = (e, href) => {
+    if (!href.includes('#')) return;
+
+    const [path, hash] = href.split('#');
+    const targetId = '#' + hash;
+    const linkPath = path || '/';
+
+    if (location.pathname === linkPath || (location.pathname === '/' && linkPath === '')) {
+      e.preventDefault();
+      const target = document.querySelector(targetId);
+      if (target) {
+        const targetY = target.getBoundingClientRect().top + window.scrollY - 72;
+        gsap.to(window, {
+          duration: 0.8,
+          scrollTo: { y: targetY },
+          ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+          overwrite: 'auto',
+        });
+        setActiveSection(hash);
+        window.history.pushState(null, null, targetId);
+      }
+    }
   };
 
   const isHardware = variant === 'hardware';
@@ -137,7 +163,7 @@ export default function Navbar({ onMenuToggle, isMenuOpen, variant = 'main' }) {
                 <a
                   key={link.label}
                   href={link.href}
-                  onClick={variant === 'main' ? (e) => handleMainLinkClick(e, link.href) : undefined}
+                  onClick={(e) => handleLinkClick(e, link.href)}
                   className={`flex items-center gap-[6px] text-[0.9rem] font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-[6px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-[350ms] after:ease-ease ${isActive ? (isHardware ? 'text-brand after:w-full' : 'text-[#214177] after:w-full') : (isHardware ? 'text-white/70 hover:text-white hover:after:w-full after:w-0' : 'text-[#214177] after:w-0 hover:text-brand hover:after:w-full')}`}
                 >
                   {link.icon}
@@ -149,7 +175,7 @@ export default function Navbar({ onMenuToggle, isMenuOpen, variant = 'main' }) {
 
           <a
             href={nav.ctaHref}
-            onClick={variant === 'main' ? (e) => handleMainLinkClick(e, nav.ctaHref) : undefined}
+            onClick={(e) => handleLinkClick(e, nav.ctaHref)}
             className="hidden md:inline-flex text-[0.9rem] font-semibold px-5 py-2.5 md:px-6 bg-brand text-white rounded-full transition-all duration-300 ease-out hover:bg-brand-h hover:scale-[1.05] hover:shadow-[0_8px_20px_-6px_rgb(0,0,0,0.5)] items-center gap-2"
           >
             {nav.ctaLabel}
