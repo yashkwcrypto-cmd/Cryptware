@@ -31,7 +31,7 @@ function getRules() {
 - Format lists with bullet points. Use bold text sparingly for emphasis.
 - Do NOT fabricate prices, timelines, or team member names.
 - Also add in first messagee in the conversation all language support and contact info for Cryptware Infotech Solutions LLP.
-- Also First search this url for full info :https://frontwebsite.cryptwareinfotech.com/ and https://frontwebsite.cryptwareinfotech.com/hardware for hardware related queries. If you can't find the answer, direct the user to contact Cryptware via phone, email, or WhatsApp.`;
+- Also First search this url for full info :https://cryptwareinfotech.com/ and https://cryptwareinfotech.com/hardware and https://cryptwareinfotech.com/hardware/product for hardware related queries. If you can't find the answer, direct the user to contact Cryptware via phone, email, or WhatsApp.`;
 }
 
 function getEmbeddedPrompt() {

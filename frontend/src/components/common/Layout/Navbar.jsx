@@ -143,7 +143,7 @@ export default function Navbar({ onMenuToggle, isMenuOpen, variant = 'main' }) {
 
   return (
     <nav className={backgroundClass}>
-      <div className="w-full max-w-[1280px] mx-auto px-6 md:px-10 lg:px-14 xl:px-16 h-full flex items-center justify-between relative">
+      <div className="w-full mx-auto px-6 md:px-10 lg:px-14 xl:px-16 h-full flex items-center justify-between relative">
         <a href={nav.logoHref} className="flex items-center z-10 h-full">
           <img
             src="/assets/img/logo-removebg-preview.png"
