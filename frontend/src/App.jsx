@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import CustomCursor from './components/CustomCursor';
-import Navbar from './components/Navbar';
-import MobileMenu from './components/MobileMenu';
-import Hero from './components/Hero';
-import Marquee from './components/Marquee';
-import Stats from './components/Stats';
-import Services from './components/Services';
-import WhyChooseUs from './components/WhyChooseUs';
-import Beliefs from './components/Beliefs';
-import TechStack from './components/TechStack';
-import TechLogos from './components/TechLogos';
-import Benefits from './components/Benefits';
-import HireDevelopers from './components/HireDevelopers';
-import About from './components/About';
-import Testimonials from './components/Testimonials';
-import Pricing from './components/Pricing';
-import Catalog from './components/Catalog';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
-import FloatingChat from './components/FloatingChat';
-import HardwareCatalogPage from './pages/HardwareCatalogPage';
-import HardwareProductPage from './pages/HardwareProductPage';
-import AdminDashboard from './pages/AdminDashboard';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import CustomCursor from './components/common/wrappers/CustomCursor';
+import Navbar from './components/common/Layout/Navbar';
+import MobileMenu from './components/common/Layout/MobileMenu';
+import Hero from './components/Landing/Hero';
+import Marquee from './components/Landing/Marquee';
+import Stats from './components/Landing/Stats';
+import Services from './components/Landing/Services';
+import WhyChooseUs from './components/Landing/WhyChooseUs';
+import Beliefs from './components/Landing/Beliefs';
+import TechStack from './components/Landing/TechStack';
+import TechLogos from './components/Landing/TechLogos';
+import Benefits from './components/Landing/Benefits';
+import HireDevelopers from './components/Landing/HireDevelopers';
+import About from './components/Landing/About';
+import Testimonials from './components/Landing/Testimonials';
+import Pricing from './components/Landing/Pricing';
+import Catalog from './components/Landing/Catalog';
+import Contact from './components/Landing/Contact';
+import Footer from './components/common/Layout/Footer';
+import FloatingChat from './components/common/wrappers/FloatingChat';
+import HardwareCatalogPage from './components/Catalog/HardwareCatalogPage';
+import HardwareProductPage from './components/Catalog/HardwareProductPage';
+import AdminDashboard from './components/Product/AdminDashboard';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 
@@ -106,6 +106,16 @@ function HomePage() {
   );
 }
 
+import AdminLogin from './components/Auth/AdminLogin';
+import { useAuth } from './context/AuthContext';
+
+const ProtectedAdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="min-h-screen bg-paper flex items-center justify-center">Loading...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+};
+
 // ─── App Router ────────────────────────────────────────────────────────────────
 export default function App() {
   return (
@@ -113,7 +123,12 @@ export default function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/hardware" element={<HardwareCatalogPage />} />
       <Route path="/hardware/product" element={<HardwareProductPage />} />
-      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/login" element={<AdminLogin />} />
+      <Route path="/admin" element={
+        <ProtectedAdminRoute>
+          <AdminDashboard />
+        </ProtectedAdminRoute>
+      } />
       {/* fallback */}
       <Route path="*" element={<HomePage />} />
     </Routes>

@@ -1,8 +1,9 @@
-import { sendError, sendSuccess } from "../services/utility/response.js";
-import { SUCCESS, ERROR, NOT_FOUND } from "../services/utility/statusCode.js";
-import { query } from "../services/database/msSqlStore.js";
+import { sendError, sendSuccess } from "../service/response.js";
+import { SUCCESS, ERROR, NOT_FOUND, BAD_REQUEST } from "../service/status-code.js";
+import { executeQuery, fetchOneFromDb, insertOneToDb, updateOneToDb, deleteOneFromDb } from "../service/database/mssql.js";
+import { TABLE } from "../service/global-constant.js";
 
-const logginKey = "DATA - STORE";
+const loggingKey = "DATA_CONTROLLER";
 
 const parseImg = (imgBuffer, id) => {
   if (!imgBuffer) return null;
@@ -23,7 +24,8 @@ const encodeImg = (reqFile, imgString) => {
 };
 
 export const create = async (req, res) => {
-  console.log(`${logginKey} - CREATE`);
+  const localLoggingKey = `${loggingKey} - CREATE`;
+  console.log(`${localLoggingKey} - START`);
   try {
     let {
       id, title, category, subcategory, brand, printerType, description,
@@ -34,60 +36,66 @@ export const create = async (req, res) => {
       img = req.file.buffer;
     }
 
-    const sql = `INSERT INTO products 
-      (id, title, category, subcategory, brand, printerType, description, img, specs, models, useCases, officialUrl, documents, type, classification, featured, isActive) 
-      VALUES (@id, @title, @category, @subcategory, @brand, @printerType, @description, @img, @specs, @models, @useCases, @officialUrl, @documents, @type, @classification, @featured, @isActive)`;
-
-    await query(sql, {
+    const data = {
       id, title, category, subcategory, brand: brand || '', printerType: printerType || '', description,
       img: encodeImg(req.file, img), specs: JSON.stringify(specs || []), models: JSON.stringify(models || []),
       useCases: JSON.stringify(useCases || []), officialUrl: officialUrl || '', documents: JSON.stringify(documents || []),
       type, classification: classification || '', featured: featured ? 1 : 0, isActive: (isActive === false || isActive === 0) ? 0 : 1
-    });
-
-    sendSuccess(res, "Product created successfully", {}, SUCCESS);
-  } catch (error) {
-    console.log(`${logginKey} - ERROR`, error);
-    if (error.code === 'ER_DUP_ENTRY' || (error.number && error.number === 2627)) {
-      return res.status(400).json({ status: false, code: 400, message: "Product ID already exists" });
+    };
+    
+    // Check if ID exists
+    const existing = await fetchOneFromDb(localLoggingKey, TABLE.PRODUCTS, { id });
+    if (existing && existing.length > 0) {
+      return sendError(res, "Product ID already exists", BAD_REQUEST);
     }
-    sendError(res, "Error creating product", ERROR);
+
+    await insertOneToDb(localLoggingKey, TABLE.PRODUCTS, data);
+
+    console.log(`${localLoggingKey} - END`);
+    return sendSuccess(res, "Product created successfully", {}, SUCCESS);
+  } catch (error) {
+    console.error(`${localLoggingKey} - ERROR`, error);
+    if (error.code === 'ER_DUP_ENTRY' || (error.number && error.number === 2627)) {
+      return sendError(res, "Product ID already exists", BAD_REQUEST);
+    }
+    return sendError(res, "Error creating product", ERROR);
   }
 };
 
 export const getAll = async (req, res) => {
-  console.log(`${logginKey} - GET ALL`);
+  const localLoggingKey = `${loggingKey} - GET_ALL`;
+  console.log(`${localLoggingKey} - START`);
   try {
     const { category, subcategory, brand, search, type } = req.query;
-    let sql = "SELECT * FROM products WHERE isActive = 1";
+    let sql = `SELECT * FROM ${TABLE.PRODUCTS} WHERE isActive = 1`;
     const params = {};
 
     if (type) {
       sql += " AND type = @type";
-      params.type = type;
+      params.type = { value: type };
     }
 
     if (category && category !== 'all') {
       sql += " AND subcategory = @category";
-      params.category = category;
+      params.category = { value: category };
     }
     if (subcategory) {
       sql += " AND subcategory = @subcategory";
-      params.subcategory = subcategory;
+      params.subcategory = { value: subcategory };
     }
     if (brand) {
       sql += " AND brand = @brand";
-      params.brand = brand;
+      params.brand = { value: brand };
     }
     if (search) {
       sql += " AND (title LIKE @search OR description LIKE @search)";
-      params.search = `%${search}%`;
+      params.search = { value: `%${search}%` };
     }
 
     sql += " ORDER BY id";
 
-    const products = await query(sql, params);
-    console.log(`${logginKey} - ROWS`, products?.length || 0);
+    const products = await executeQuery(localLoggingKey, sql, params);
+    console.log(`${localLoggingKey} - ROWS ${products?.length || 0}`);
     
     const parsed = (products || []).map(p => ({
       ...p,
@@ -98,25 +106,23 @@ export const getAll = async (req, res) => {
       documents: JSON.parse(p.documents || '[]'),
     }));
 
-    sendSuccess(res, "Products fetched successfully", parsed, SUCCESS);
+    console.log(`${localLoggingKey} - END`);
+    return sendSuccess(res, "Products fetched successfully", parsed, SUCCESS);
   } catch (error) {
-    console.log(`${logginKey} - ERROR`, error);
-    sendError(res, "Error fetching products", ERROR);
+    console.error(`${localLoggingKey} - ERROR`, error);
+    return sendError(res, "Error fetching products", ERROR);
   }
 };
 
 export const getOne = async (req, res) => {
+  const localLoggingKey = `${loggingKey} - GET_ONE`;
+  console.log(`${localLoggingKey} - START`);
   try {
     const { id } = req.params;
-    const sql = "SELECT * FROM products WHERE id = @id";
-    const products = await query(sql, { id });
+    const products = await fetchOneFromDb(localLoggingKey, TABLE.PRODUCTS, { id });
 
     if (!products || products.length === 0) {
-      return res.status(NOT_FOUND).json({
-        status: false,
-        code: NOT_FOUND,
-        message: "Product not found",
-      });
+      return sendError(res, "Product not found", NOT_FOUND);
     }
 
     const product = {
@@ -128,14 +134,17 @@ export const getOne = async (req, res) => {
       documents: JSON.parse(products[0].documents || '[]'),
     };
 
-    sendSuccess(res, "Product fetched successfully", product, SUCCESS);
+    console.log(`${localLoggingKey} - END`);
+    return sendSuccess(res, "Product fetched successfully", product, SUCCESS);
   } catch (error) {
-    console.log(`${logginKey} - ERROR`, error);
-    sendError(res, "Error fetching product", ERROR);
+    console.error(`${localLoggingKey} - ERROR`, error);
+    return sendError(res, "Error fetching product", ERROR);
   }
 };
 
 export const update = async (req, res) => {
+  const localLoggingKey = `${loggingKey} - UPDATE`;
+  console.log(`${localLoggingKey} - START`);
   try {
     const { id } = req.params;
     let {
@@ -147,117 +156,126 @@ export const update = async (req, res) => {
       img = req.file.buffer;
     }
 
-    let sql = `UPDATE products SET 
-      title = @title, category = @category, subcategory = @subcategory, brand = @brand, printerType = @printerType, 
-      description = @description, specs = @specs, models = @models, useCases = @useCases, 
-      officialUrl = @officialUrl, documents = @documents, type = @type, classification = @classification, featured = @featured, isActive = @isActive`;
-
-    if (req.file || img) {
-      sql += `, img = @img`;
-    }
-
-    sql += ` WHERE id = @id`;
-
-    await query(sql, {
-      id, title, category, subcategory, brand: brand || '', printerType: printerType || '', description,
-      img: encodeImg(req.file, img), specs: JSON.stringify(specs || []), models: JSON.stringify(models || []),
+    const data = {
+      title, category, subcategory, brand: brand || '', printerType: printerType || '', description,
+      specs: JSON.stringify(specs || []), models: JSON.stringify(models || []),
       useCases: JSON.stringify(useCases || []), officialUrl: officialUrl || '', documents: JSON.stringify(documents || []),
       type, classification: classification || '', featured: featured ? 1 : 0, isActive: (isActive === false || isActive === 0) ? 0 : 1
-    });
+    };
 
-    sendSuccess(res, "Product updated successfully", {}, SUCCESS);
+    const encodedImg = encodeImg(req.file, img);
+    if (encodedImg !== null) {
+      data.img = encodedImg;
+    }
+
+    await updateOneToDb(localLoggingKey, TABLE.PRODUCTS, { id }, data);
+
+    console.log(`${localLoggingKey} - END`);
+    return sendSuccess(res, "Product updated successfully", {}, SUCCESS);
   } catch (error) {
-    console.log(`${logginKey} - ERROR`, error);
-    sendError(res, "Error updating product", ERROR);
+    console.error(`${localLoggingKey} - ERROR`, error);
+    return sendError(res, "Error updating product", ERROR);
   }
 };
 
 export const deleteData = async (req, res) => {
+  const localLoggingKey = `${loggingKey} - DELETE`;
+  console.log(`${localLoggingKey} - START`);
   try {
     const { id } = req.params;
-    const sql = "DELETE FROM products WHERE id = @id";
-    await query(sql, { id });
+    await deleteOneFromDb(localLoggingKey, TABLE.PRODUCTS, { id });
 
-    sendSuccess(res, "Product deleted successfully", {}, SUCCESS);
+    console.log(`${localLoggingKey} - END`);
+    return sendSuccess(res, "Product deleted successfully", {}, SUCCESS);
   } catch (error) {
-    console.log(`${logginKey} - ERROR`, error);
-    sendError(res, "Error deleting product", ERROR);
+    console.error(`${localLoggingKey} - ERROR`, error);
+    return sendError(res, "Error deleting product", ERROR);
   }
 };
 
 export const getSubcategories = async (req, res) => {
+  const localLoggingKey = `${loggingKey} - GET_SUBCATEGORIES`;
+  console.log(`${localLoggingKey} - START`);
   try {
     const { type } = req.query;
-    let sql = "SELECT subcategory, COUNT(*) as count FROM products WHERE isActive = 1";
+    let sql = `SELECT subcategory, COUNT(*) as count FROM ${TABLE.PRODUCTS} WHERE isActive = 1`;
     const params = {};
 
     if (type) {
       sql += " AND type = @type";
-      params.type = type;
+      params.type = { value: type };
     }
 
     sql += " GROUP BY subcategory ORDER BY subcategory";
 
-    const rows = await query(sql, params);
+    const rows = await executeQuery(localLoggingKey, sql, params);
     const result = (rows || []).map(r => ({
       subcategory: r.subcategory,
       count: r.count,
     }));
 
-    sendSuccess(res, "Subcategories fetched successfully", result, SUCCESS);
+    console.log(`${localLoggingKey} - END`);
+    return sendSuccess(res, "Subcategories fetched successfully", result, SUCCESS);
   } catch (error) {
-    console.log(`${logginKey} - ERROR`, error);
-    sendError(res, "Error fetching subcategories", ERROR);
+    console.error(`${localLoggingKey} - ERROR`, error);
+    return sendError(res, "Error fetching subcategories", ERROR);
   }
 };
 
 export const getDistinctValues = async (req, res) => {
+  const localLoggingKey = `${loggingKey} - GET_DISTINCT_VALUES`;
+  console.log(`${localLoggingKey} - START`);
   try {
     const { type, field } = req.query;
     const allowedFields = ['subcategory', 'brand', 'printerType', 'classification', 'category'];
     if (!field || !allowedFields.includes(field)) {
-      return res.status(400).json({ status: false, message: 'Invalid field requested' });
+      return sendError(res, "Invalid field requested", BAD_REQUEST);
     }
 
-    let sql = `SELECT DISTINCT ${field}, subcategory FROM products WHERE isActive = 1 AND ${field} IS NOT NULL AND ${field} != ''`;
+    let sql = `SELECT DISTINCT ${field}, subcategory FROM ${TABLE.PRODUCTS} WHERE isActive = 1 AND ${field} IS NOT NULL AND ${field} != ''`;
     const params = {};
 
     if (type) {
       sql += " AND type = @type";
-      params.type = type;
+      params.type = { value: type };
     }
 
     sql += ` ORDER BY ${field}`;
 
-    const rows = await query(sql, params);
-    sendSuccess(res, "Distinct values fetched successfully", rows || [], SUCCESS);
+    const rows = await executeQuery(localLoggingKey, sql, params);
+    console.log(`${localLoggingKey} - END`);
+    return sendSuccess(res, "Distinct values fetched successfully", rows || [], SUCCESS);
   } catch (error) {
-    console.log(`${logginKey} - ERROR`, error);
-    sendError(res, "Error fetching distinct values", ERROR);
+    console.error(`${localLoggingKey} - ERROR`, error);
+    return sendError(res, "Error fetching distinct values", ERROR);
   }
 };
 
 export const getImage = async (req, res) => {
+  const localLoggingKey = `${loggingKey} - GET_IMAGE`;
+  console.log(`${localLoggingKey} - START`);
   try {
     const { id } = req.params;
-    const products = await query(`SELECT img FROM products WHERE id = @id`, { id });
+    const products = await fetchOneFromDb(localLoggingKey, TABLE.PRODUCTS, { id });
     
     if (!products || products.length === 0 || !products[0].img) {
-      return res.status(404).send('Image not found');
+      return res.status(NOT_FOUND).send('Image not found');
     }
 
     const imgBuffer = products[0].img;
     
     // If it's a legacy string path (starts with / or h), redirect to it
     if (imgBuffer[0] === 0x2F || imgBuffer[0] === 0x68) {
+      console.log(`${localLoggingKey} - END`);
       return res.redirect(imgBuffer.toString('utf8'));
     }
 
     // Otherwise, send the binary data
     res.setHeader('Content-Type', 'image/png');
     res.send(imgBuffer);
+    console.log(`${localLoggingKey} - END`);
   } catch (error) {
-    console.log(`${logginKey} - ERROR`, error);
-    res.status(500).send('Server Error');
+    console.error(`${localLoggingKey} - ERROR`, error);
+    res.status(ERROR).send('Server Error');
   }
 };

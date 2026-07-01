@@ -1,9 +1,9 @@
-import { sendError, sendSuccess } from "../services/utility/response.js";
-import { SUCCESS, ERROR } from "../services/utility/statusCode.js";
+import { sendError, sendSuccess } from "../service/response.js";
+import { SUCCESS, ERROR } from "../service/status-code.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { buildSystemPrompt } from "../services/ai.system.js";
+import { buildSystemPrompt } from "../service/ai.system.js";
 
-const logginKey = "AI - API";
+const loggingKey = "AI_CONTROLLER";
 
 // NVIDIA AI API call
 async function callNvidiaAI(prompt, history) {
@@ -83,7 +83,8 @@ async function callGeminiAI(prompt, history) {
 }
 
 export const getRecommendation = async (req, res) => {
-  console.log(`${logginKey} - GET RECOMMENDATION`);
+  const localLoggingKey = `${loggingKey} - GET_RECOMMENDATION`;
+  console.log(`${localLoggingKey} - START`);
   try {
     const { prompt, history = [] } = req.body;
     
@@ -96,28 +97,29 @@ export const getRecommendation = async (req, res) => {
 
     // Try NVIDIA first
     try {
-      console.log(`${logginKey} - Trying NVIDIA AI`);
+      console.log(`${localLoggingKey} - Trying NVIDIA AI`);
       reply = await callNvidiaAI(prompt, history);
       provider = "NVIDIA";
-      console.log(`${logginKey} - NVIDIA AI success`);
+      console.log(`${localLoggingKey} - NVIDIA AI success`);
     } catch (nvidiaError) {
-      console.log(`${logginKey} - NVIDIA AI failed:`, nvidiaError.message);
+      console.log(`${localLoggingKey} - NVIDIA AI failed:`, nvidiaError.message);
       
       // Fallback to Gemini
       try {
-        console.log(`${logginKey} - Falling back to Gemini AI`);
+        console.log(`${localLoggingKey} - Falling back to Gemini AI`);
         reply = await callGeminiAI(prompt, history);
         provider = "Gemini";
-        console.log(`${logginKey} - Gemini AI success`);
+        console.log(`${localLoggingKey} - Gemini AI success`);
       } catch (geminiError) {
-        console.log(`${logginKey} - Gemini AI failed:`, geminiError.message);
+        console.log(`${localLoggingKey} - Gemini AI failed:`, geminiError.message);
         throw new Error("Both NVIDIA and Gemini AI services failed. Please try again later.");
       }
     }
 
-    sendSuccess(res, `AI response generated successfully via ${provider}`, { reply, provider }, SUCCESS);
+    console.log(`${localLoggingKey} - END`);
+    return sendSuccess(res, `AI response generated successfully via ${provider}`, { reply, provider }, SUCCESS);
   } catch (error) {
-    console.log(`${logginKey} - ERROR`, error);
-    sendError(res, error.message || "Error generating AI response", ERROR);
+    console.error(`${localLoggingKey} - ERROR`, error);
+    return sendError(res, error.message || "Error generating AI response", ERROR);
   }
 };

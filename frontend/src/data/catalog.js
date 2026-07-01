@@ -152,8 +152,8 @@ export const hardwareCategories = [
     icon: 'label',
     tagline: 'The right label for every surface',
     description: 'Comprehensive range of barcode labels, specialty tags, and thermal transfer ribbons — from plain paper to polyester, food-safe to tamper-evident.',
-    heroImg: '/assets/img/Product/consumable/consumable.jpg',
-    bgImg: '/assets/img/Product/consumable/consumable.jpg',
+    heroImg: '/assets/img/Product/consumable/Printed-Barcode-Label.jpeg',
+    bgImg: '/assets/img/Product/consumable/Printed-Barcode-Label.jpeg',
     subtypes: [
       'Plain Barcode Labels',
       'Colored Barcode Labels',
